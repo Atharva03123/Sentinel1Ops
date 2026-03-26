@@ -18,15 +18,14 @@ import config
 # ──────────────────────────────────────────────────────────────
 
 def get_connection():
-    """Return a new psycopg2 connection using settings from config."""
-    return psycopg2.connect(
-        host=config.DB_HOST,
-        port=config.DB_PORT,
-        dbname=config.DB_NAME,
-        user=config.DB_USER,
-        password=config.DB_PASSWORD,
-        connect_timeout=5,
-    )
+    import os
+    import psycopg2
+
+    url = os.environ["DATABASE_URL"]
+    if url.startswith("postgres://"):
+        url = url.replace("postgres://", "postgresql://", 1)
+    return psycopg2.connect(url, sslmode="require")
+
 
 
 @contextmanager
