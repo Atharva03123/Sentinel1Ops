@@ -15,7 +15,9 @@ Environment variables (override config.py defaults):
     SENTINEL_DB_USER   SENTINEL_DB_PASS
     SENTINEL_INTERVAL  SENTINEL_WINDOW
 """
+from db import initialize_schema
 
+initialize_schema()
 import argparse
 import sys
 import time
