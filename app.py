@@ -4,6 +4,9 @@ import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 import platform
 import psutil
+from db import initialize_schema
+
+initialize_schema()
 
 # Safe imports
 try:
