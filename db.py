@@ -13,6 +13,7 @@ from typing import Optional
 import config
 
 
+
 # ──────────────────────────────────────────────────────────────
 #  Connection factory
 # ──────────────────────────────────────────────────────────────
@@ -21,11 +22,20 @@ def get_connection():
     import os
     import psycopg2
 
-    url = os.environ["DATABASE_URL"]
-    if url.startswith("postgres://"):
-        url = url.replace("postgres://", "postgresql://", 1)
-    return psycopg2.connect(url, sslmode="require")
+    db_url = os.getenv("DATABASE_URL")
 
+    # Render
+    if db_url:
+        return psycopg2.connect(db_url)
+
+    # Local
+    return psycopg2.connect(
+        host="localhost",
+        port=5432,
+        dbname="sentinelops",
+        user="postgres",
+        password="atharva"
+    )
 
 
 @contextmanager

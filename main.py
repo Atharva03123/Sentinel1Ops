@@ -17,7 +17,6 @@ Environment variables (override config.py defaults):
 """
 from db import initialize_schema
 
-initialize_schema()
 import argparse
 import sys
 import time
