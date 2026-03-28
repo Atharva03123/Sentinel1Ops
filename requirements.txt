@@ -6,7 +6,6 @@ psycopg2-binary>=2.9.6 # PostgreSQL adapter (binary = no build tools needed)
 pandas>=2.0.0          # DataFrame processing & feature engineering
 numpy>=1.24.0          # Numerical computation & regression
 rich>=13.4.0           # Beautiful terminal UI (tables, panels, live)
-streamlit
+streamlit==1.32.0
 matplotlib
-
 altair==4.2.2
