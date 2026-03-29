@@ -166,7 +166,7 @@ st.markdown(f"""
 </div>
 """, unsafe_allow_html=True)
 
-st.markdown("<div style='overflow-x:hidden;'>" + styled.to_html(index=False) + "</div>", unsafe_allow_html=True)
+st.markdown("<div style='overflow-x:auto;'>" + styled.to_html(index=False) + "</div>", unsafe_allow_html=True)
 
 # ─────────────────────────────
 # LIVE METRICS
