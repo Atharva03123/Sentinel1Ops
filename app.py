@@ -6,7 +6,12 @@ import platform
 import psutil
 from db import initialize_schema
 
-initialize_schema()
+# ✅ SAFE DB INIT
+@st.cache_resource
+def init_db():
+    initialize_schema()
+
+init_db()
 
 # Safe imports
 try:
