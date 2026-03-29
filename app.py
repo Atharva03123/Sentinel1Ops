@@ -1,10 +1,20 @@
 import streamlit as st
+
+# ✅ FIRST STREAMLIT COMMAND
+st.set_page_config(
+    page_title="SentinelOps Dashboard",
+    page_icon="🛡️",
+    layout="wide",
+    initial_sidebar_state="collapsed"
+)
+import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 import platform
 import psutil
 from db import initialize_schema
+
 
 # ✅ SAFE DB INIT
 @st.cache_resource
