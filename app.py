@@ -7,7 +7,7 @@ st.set_page_config(
     layout="wide",
     initial_sidebar_state="collapsed"
 )
-import streamlit as st
+
 import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
@@ -34,12 +34,7 @@ except Exception as e:
 # ─────────────────────────────
 # PAGE CONFIG
 # ─────────────────────────────
-st.set_page_config(
-    page_title="SentinelOps Dashboard",
-    page_icon="🛡️",
-    layout="wide",
-    initial_sidebar_state="collapsed"
-)
+
 
 # ─────────────────────────────
 # GLOBAL STYLES
