@@ -173,6 +173,17 @@ st.markdown("<div style='margin-top:20px;'></div>", unsafe_allow_html=True)
 # ─────────────────────────────
 try:
     data = metrics.collect()
+
+    # ✅ ADD THIS (DATABASE SAVE)
+    try:
+        db.insert_metrics(
+            data['cpu_percent'],
+            data['memory_percent'],
+            data['disk_percent']
+        )
+    except:
+        pass
+
 except Exception as e:
     st.error(f"Metrics Error: {e}")
     st.stop()
@@ -220,7 +231,7 @@ st.markdown("<div style='margin-top:24px;'></div>", unsafe_allow_html=True)
 # FETCH DATA
 # ─────────────────────────────
 try:
-    rows = db.fetch_recent_metrics(30)
+    rows = db.fetch_recent_metrics(200)
 except Exception as e:
     st.error(f"Database Error: {e}")
     rows = []
