@@ -11,6 +11,8 @@ st.set_page_config(
 import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
+import matplotlib
+matplotlib.use("Agg")
 import platform
 import psutil
 from db import initialize_schema
@@ -290,7 +292,9 @@ st.markdown("<div style='margin-top:20px;'></div>", unsafe_allow_html=True)
 # LIVE METRICS
 # ─────────────────────────────
 try:
-    data = metrics.collect()
+   
+    with st.spinner("Loading metrics..."):
+        data = metrics.collect()
 except Exception as e:
     st.error(f"Metrics Error: {e}")
     st.stop()
@@ -338,7 +342,9 @@ st.markdown("<div style='margin-top:24px;'></div>", unsafe_allow_html=True)
 # FETCH DATA
 # ─────────────────────────────
 try:
-    rows = db.fetch_recent_metrics(30)
+    
+    with st.spinner("Fetching data..."):
+        rows = db.fetch_recent_metrics(30)
 except Exception as e:
     st.error(f"Database Error: {e}")
     rows = []
