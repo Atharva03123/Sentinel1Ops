@@ -397,7 +397,7 @@ if rows:
             {"selector": "table", "props": [("border-collapse", "collapse"), ("width", "100%")]},
         ])
 
-    st.markdown('<div class="card" style="padding:0; overflow:hidden;">', unsafe_allow_html=True)
+    st.markdown('<div class="card" style="padding:0; overflow:auto;">', unsafe_allow_html=True)
     st.markdown("<div style='overflow-x:auto;'>" + styled.to_html(index=False) + "</div>", unsafe_allow_html=True)
     st.markdown('</div>', unsafe_allow_html=True)
 
