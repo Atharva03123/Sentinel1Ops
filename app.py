@@ -1,40 +1,9 @@
-
-import os
 import streamlit as st
-
-if "DATABASE_URL" in st.secrets:
-    os.environ["DATABASE_URL"] = st.secrets["DATABASE_URL"]
-
-st.set_page_config(
-    page_title="SentinelOps Dashboard",
-    
-)
-import streamlit as st
-
-# ✅ FIRST STREAMLIT COMMAND
-st.set_page_config(
-    page_title="SentinelOps Dashboard",
-    page_icon="🛡️",
-    layout="wide",
-    initial_sidebar_state="collapsed"
-)
-
 import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
-import matplotlib
-matplotlib.use("Agg")
 import platform
 import psutil
-from db import initialize_schema
-
-
-# ✅ SAFE DB INIT
-@st.cache_resource
-def init_db():
-    initialize_schema()
-
-init_db()
 
 # Safe imports
 try:
@@ -45,123 +14,35 @@ except Exception as e:
     st.stop()
 
 # ─────────────────────────────
-# 
+# PAGE CONFIG
 # ─────────────────────────────
+st.set_page_config(
+    page_title="SentinelOps Dashboard",
+    page_icon="🛡️",
+    layout="wide",
+    initial_sidebar_state="collapsed"
+)
+
 st.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
-
-    html, body, [class*="css"] {
-        font-family: 'Inter', sans-serif;
-    }
-
+    html, body, [class*="css"] { font-family: 'Inter', sans-serif; }
     #MainMenu {visibility: hidden;}
     footer {visibility: hidden;}
     header {visibility: hidden;}
-
-    .stApp {
-        background-color: #0f1117;
-        color: #e0e0e0;
-    }
-
-    .block-container {
-        padding-top: 2rem;
-        padding-bottom: 2rem;
-        padding-left: 2.5rem;
-        padding-right: 2.5rem;
-    }
-
-    .card {
-        background: #1a1d27;
-        border: 1px solid #2a2d3e;
-        border-radius: 12px;
-        padding: 20px 24px;
-        margin-bottom: 8px;
-    }
-
-    .card-title {
-        font-size: 11px;
-        font-weight: 600;
-        letter-spacing: 1.2px;
-        text-transform: uppercase;
-        color: #6b7280;
-        margin-bottom: 6px;
-    }
-
-    .card-value {
-        font-size: 32px;
-        font-weight: 700;
-        line-height: 1.1;
-        margin-bottom: 2px;
-    }
-
-    .card-sub {
-        font-size: 12px;
-        color: #6b7280;
-        margin-top: 4px;
-    }
-
-    .section-header {
-        font-size: 13px;
-        font-weight: 600;
-        letter-spacing: 1px;
-        text-transform: uppercase;
-        color: #6b7280;
-        margin-bottom: 12px;
-        margin-top: 8px;
-    }
-
-    .alert-critical {
-        background: #2d1a1a;
-        border-left: 4px solid #ef4444;
-        border-radius: 8px;
-        padding: 12px 16px;
-        margin-bottom: 8px;
-        font-size: 13px;
-    }
-
-    .alert-warning {
-        background: #2d2410;
-        border-left: 4px solid #f59e0b;
-        border-radius: 8px;
-        padding: 12px 16px;
-        margin-bottom: 8px;
-        font-size: 13px;
-    }
-
-    .alert-ok {
-        background: #102d1a;
-        border-left: 4px solid #22c55e;
-        border-radius: 8px;
-        padding: 12px 16px;
-        font-size: 13px;
-    }
-
-    .graph-label {
-        font-size: 12px;
-        font-weight: 600;
-        letter-spacing: 0.8px;
-        text-transform: uppercase;
-        color: #6b7280;
-        margin-bottom: 6px;
-    }
-
-    .stButton > button {
-        background: #2563eb;
-        color: white;
-        border: none;
-        border-radius: 8px;
-        padding: 8px 24px;
-        font-weight: 600;
-        font-size: 13px;
-        letter-spacing: 0.5px;
-    }
-
-    .stButton > button:hover {
-        background: #1d4ed8;
-        color: white;
-    }
-
+    .stApp { background-color: #0f1117; color: #e0e0e0; }
+    .block-container { padding-top: 2rem; padding-bottom: 2rem; padding-left: 2.5rem; padding-right: 2.5rem; }
+    .card { background: #1a1d27; border: 1px solid #2a2d3e; border-radius: 12px; padding: 20px 24px; margin-bottom: 8px; }
+    .card-title { font-size: 11px; font-weight: 600; letter-spacing: 1.2px; text-transform: uppercase; color: #6b7280; margin-bottom: 6px; }
+    .card-value { font-size: 32px; font-weight: 700; line-height: 1.1; margin-bottom: 2px; }
+    .card-sub { font-size: 12px; color: #6b7280; margin-top: 4px; }
+    .section-header { font-size: 13px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; color: #6b7280; margin-bottom: 12px; margin-top: 8px; }
+    .alert-critical { background: #2d1a1a; border-left: 4px solid #ef4444; border-radius: 8px; padding: 12px 16px; margin-bottom: 8px; font-size: 13px; }
+    .alert-warning { background: #2d2410; border-left: 4px solid #f59e0b; border-radius: 8px; padding: 12px 16px; margin-bottom: 8px; font-size: 13px; }
+    .alert-ok { background: #102d1a; border-left: 4px solid #22c55e; border-radius: 8px; padding: 12px 16px; font-size: 13px; }
+    .graph-label { font-size: 12px; font-weight: 600; letter-spacing: 0.8px; text-transform: uppercase; color: #6b7280; margin-bottom: 6px; }
+    .stButton > button { background: #2563eb; color: white; border: none; border-radius: 8px; padding: 8px 24px; font-weight: 600; font-size: 13px; letter-spacing: 0.5px; }
+    .stButton > button:hover { background: #1d4ed8; color: white; }
     hr { border-color: #2a2d3e !important; margin: 24px 0 !important; }
 </style>
 """, unsafe_allow_html=True)
@@ -178,13 +59,10 @@ def check_login():
         st.markdown("""
         <div style="display:flex; flex-direction:column; align-items:center; margin-top:80px; margin-bottom:32px;">
             <div style="display:flex; align-items:baseline; gap:0px;">
-                <span style="font-family:'Courier New',monospace; font-size:32px; font-weight:700;
-                             letter-spacing:6px; color:#a5b4fc;">SENTINEL</span>
-                <span style="font-family:'Courier New',monospace; font-size:32px; font-weight:700;
-                             letter-spacing:4px; color:#f472b6;">OPS</span>
+                <span style="font-family:'Courier New',monospace; font-size:32px; font-weight:700; letter-spacing:6px; color:#a5b4fc;">SENTINEL</span>
+                <span style="font-family:'Courier New',monospace; font-size:32px; font-weight:700; letter-spacing:4px; color:#f472b6;">OPS</span>
             </div>
-            <p style="color:#4b5563; font-family:'Courier New',monospace; font-size:10px;
-                      letter-spacing:3px; margin-top:6px;">SYSTEM ACCESS PORTAL</p>
+            <p style="color:#4b5563; font-family:'Courier New',monospace; font-size:10px; letter-spacing:3px; margin-top:6px;">SYSTEM ACCESS PORTAL</p>
         </div>
         """, unsafe_allow_html=True)
 
@@ -213,24 +91,18 @@ check_login()
 # HELPERS
 # ─────────────────────────────
 def metric_color(value, warn=60, crit=85):
-    if value >= crit:
-        return "#ef4444"
-    elif value >= warn:
-        return "#f59e0b"
+    if value >= crit:   return "#ef4444"
+    elif value >= warn: return "#f59e0b"
     return "#22c55e"
 
 def health_color(score):
-    if score < 50:
-        return "#ef4444"
-    elif score < 70:
-        return "#f59e0b"
+    if score < 50:   return "#ef4444"
+    elif score < 70: return "#f59e0b"
     return "#22c55e"
 
 def health_label(score):
-    if score < 50:
-        return "CRITICAL"
-    elif score < 70:
-        return "WARNING"
+    if score < 50:   return "CRITICAL"
+    elif score < 70: return "WARNING"
     return "NORMAL"
 
 def make_graph(df, col, color, ax):
@@ -259,13 +131,10 @@ with col_logo:
         <span style="font-size:30px; filter: drop-shadow(0 0 6px #6366f1);">🛡️</span>
         <div>
             <div style="display:flex; align-items:baseline; gap:0px;">
-                <span style="font-family:'Courier New',monospace; font-size:26px; font-weight:700;
-                             letter-spacing:6px; color:#a5b4fc;">SENTINEL</span>
-                <span style="font-family:'Courier New',monospace; font-size:26px; font-weight:700;
-                             letter-spacing:4px; color:#f472b6;">OPS</span>
+                <span style="font-family:'Courier New',monospace; font-size:26px; font-weight:700; letter-spacing:6px; color:#a5b4fc;">SENTINEL</span>
+                <span style="font-family:'Courier New',monospace; font-size:26px; font-weight:700; letter-spacing:4px; color:#f472b6;">OPS</span>
             </div>
-            <div style="font-family:'Courier New',monospace; font-size:10px; color:#4b5563;
-                        letter-spacing:3px; margin-top:2px;">AUTOMATED SYSTEM HEALTH ENGINE</div>
+            <div style="font-family:'Courier New',monospace; font-size:10px; color:#4b5563; letter-spacing:3px; margin-top:2px;">AUTOMATED SYSTEM HEALTH ENGINE</div>
         </div>
     </div>
     """, unsafe_allow_html=True)
@@ -303,9 +172,7 @@ st.markdown("<div style='margin-top:20px;'></div>", unsafe_allow_html=True)
 # LIVE METRICS
 # ─────────────────────────────
 try:
-   
-    with st.spinner("Loading metrics..."):
-        data = metrics.collect()
+    data = metrics.collect()
 except Exception as e:
     st.error(f"Metrics Error: {e}")
     st.stop()
@@ -353,9 +220,7 @@ st.markdown("<div style='margin-top:24px;'></div>", unsafe_allow_html=True)
 # FETCH DATA
 # ─────────────────────────────
 try:
-    
-    with st.spinner("Fetching data..."):
-        rows = db.fetch_recent_metrics(30)
+    rows = db.fetch_recent_metrics(30)
 except Exception as e:
     st.error(f"Database Error: {e}")
     rows = []
@@ -455,6 +320,10 @@ if rows:
     table_df["collected_at"] = pd.to_datetime(table_df["collected_at"]).dt.strftime("%Y-%m-%d %H:%M:%S")
     table_df = table_df.round(2)
 
+    # Keep only important columns — hide None columns
+    keep_cols = [c for c in ["collected_at", "cpu_percent", "memory_percent", "disk_percent"] if c in table_df.columns]
+    table_df = table_df[keep_cols]
+
     rename_map = {
         "collected_at": "Timestamp",
         "cpu_percent": "CPU %",
@@ -463,12 +332,72 @@ if rows:
     }
     table_df.rename(columns={k: v for k, v in rename_map.items() if k in table_df.columns}, inplace=True)
 
-    st.dataframe(
-        table_df,
-        use_container_width=True,
-        height=360,
-        hide_index=True,
-    )
+    def color_cpu(val):
+        if isinstance(val, float):
+            if val >= 85:   return "background-color:#3d1a1a; color:#ef4444; font-weight:700;"
+            elif val >= 60: return "background-color:#3d2e10; color:#f59e0b; font-weight:700;"
+            else:           return "background-color:#0f2d1a; color:#22c55e; font-weight:700;"
+        return ""
+
+    def color_mem(val):
+        if isinstance(val, float):
+            if val >= 88:   return "background-color:#3d1a1a; color:#ef4444; font-weight:700;"
+            elif val >= 70: return "background-color:#3d2e10; color:#f59e0b; font-weight:700;"
+            else:           return "background-color:#0f2d1a; color:#22c55e; font-weight:700;"
+        return ""
+
+    def color_disk(val):
+        if isinstance(val, float):
+            if val >= 90:   return "background-color:#3d1a1a; color:#ef4444; font-weight:700;"
+            elif val >= 75: return "background-color:#3d2e10; color:#f59e0b; font-weight:700;"
+            else:           return "background-color:#0f2d1a; color:#22c55e; font-weight:700;"
+        return ""
+
+    def style_ts(val):
+        return "color:#6b7280; font-size:12px;"
+
+    styled = table_df.style\
+        .applymap(color_cpu,  subset=["CPU %"]     if "CPU %"     in table_df.columns else [])\
+        .applymap(color_mem,  subset=["Memory %"]  if "Memory %"  in table_df.columns else [])\
+        .applymap(color_disk, subset=["Disk %"]    if "Disk %"    in table_df.columns else [])\
+        .applymap(style_ts,   subset=["Timestamp"] if "Timestamp" in table_df.columns else [])\
+        .set_table_styles([
+            {"selector": "thead th", "props": [
+                ("background-color", "#1a1d27"),
+                ("color", "#a5b4fc"),
+                ("font-family", "'Courier New', monospace"),
+                ("font-size", "11px"),
+                ("letter-spacing", "1.5px"),
+                ("text-transform", "uppercase"),
+                ("padding", "10px 14px"),
+                ("border-bottom", "2px solid #2a2d3e"),
+                ("text-align", "center"),
+            ]},
+            {"selector": "tbody tr:nth-child(even)", "props": [("background-color", "#141720")]},
+            {"selector": "tbody tr:nth-child(odd)",  "props": [("background-color", "#1a1d27")]},
+            {"selector": "tbody tr:hover",           "props": [("background-color", "#252840")]},
+            {"selector": "td", "props": [
+                ("padding", "9px 14px"),
+                ("font-size", "13px"),
+                ("font-family", "'Inter', sans-serif"),
+                ("text-align", "center"),
+                ("border-bottom", "1px solid #2a2d3e"),
+            ]},
+            {"selector": "table", "props": [("border-collapse", "collapse"), ("width", "100%")]},
+        ])
+
+    st.markdown('<div class="card" style="padding:0; overflow:hidden;">', unsafe_allow_html=True)
+    st.markdown("<div style='overflow-x:auto;'>" + styled.to_html(index=False) + "</div>", unsafe_allow_html=True)
+    st.markdown('</div>', unsafe_allow_html=True)
+
+    st.markdown("""
+    <div style="display:flex; gap:20px; margin-top:8px; margin-left:4px;">
+        <span style="font-size:11px; color:#22c55e;">● Normal</span>
+        <span style="font-size:11px; color:#f59e0b;">● Warning</span>
+        <span style="font-size:11px; color:#ef4444;">● Critical</span>
+    </div>
+    """, unsafe_allow_html=True)
+
 else:
     st.markdown("""
     <div class="card" style="text-align:center; color:#6b7280; padding:32px;">
