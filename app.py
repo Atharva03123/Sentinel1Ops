@@ -320,145 +320,71 @@ if rows:
     table_df["collected_at"] = pd.to_datetime(table_df["collected_at"]).dt.strftime("%Y-%m-%d %H:%M:%S")
     table_df = table_df.round(2)
 
-    # ── Enrich with extra columns using psutil (fill None values) ──
-    vm   = psutil.virtual_memory()
-    di   = psutil.disk_usage("/")
-    la   = psutil.getloadavg() if hasattr(psutil, "getloadavg") else (None, None, None)
-    freq = psutil.cpu_freq()
-
-    cpu_freq_val     = round(freq.current, 1)  if freq  else None
-    mem_used_gb_val  = round(vm.used / (1024**3), 2)
-    disk_used_gb_val = round(di.used / (1024**3), 2)
-    la1  = round(la[0], 2) if la[0] is not None else None
-    la5  = round(la[1], 2) if la[1] is not None else None
-    la15 = round(la[2], 2) if la[2] is not None else None
-
-    # Fill extra columns for every row (same snapshot, slight jitter per row)
-    import random
-    n = len(table_df)
-
-    def _jitter(base, pct=0.03):
-        """Add tiny ±pct jitter so each row looks distinct."""
-        if base is None:
-            return None
-        return round(base * (1 + random.uniform(-pct, pct)), 2)
-
-    table_df["cpu_freq_mhz"]   = [_jitter(cpu_freq_val,  0.02) for _ in range(n)]
-    table_df["memory_used_gb"] = [_jitter(mem_used_gb_val, 0.01) for _ in range(n)]
-    table_df["disk_used_gb"]   = [_jitter(disk_used_gb_val, 0.005) for _ in range(n)]
-    table_df["load_avg_1m"]    = [_jitter(la1,  0.05) for _ in range(n)]
-    table_df["load_avg_5m"]    = [_jitter(la5,  0.05) for _ in range(n)]
-    table_df["load_avg_15m"]   = [_jitter(la15, 0.05) for _ in range(n)]
-
-    keep_cols = [c for c in [
-        "collected_at", "cpu_percent", "memory_percent", "disk_percent",
-        "cpu_freq_mhz", "memory_used_gb", "disk_used_gb",
-        "load_avg_1m", "load_avg_5m", "load_avg_15m"
-    ] if c in table_df.columns]
+    # Keep only important columns — hide None columns
+    keep_cols = [c for c in ["collected_at", "cpu_percent", "memory_percent", "disk_percent"] if c in table_df.columns]
     table_df = table_df[keep_cols]
 
     rename_map = {
-        "collected_at":    "Timestamp",
-        "cpu_percent":     "CPU %",
-        "memory_percent":  "Memory %",
-        "disk_percent":    "Disk %",
-        "cpu_freq_mhz":    "CPU MHz",
-        "memory_used_gb":  "Mem Used (GB)",
-        "disk_used_gb":    "Disk Used (GB)",
-        "load_avg_1m":     "Load 1m",
-        "load_avg_5m":     "Load 5m",
-        "load_avg_15m":    "Load 15m",
+        "collected_at": "Timestamp",
+        "cpu_percent": "CPU %",
+        "memory_percent": "Memory %",
+        "disk_percent": "Disk %",
     }
     table_df.rename(columns={k: v for k, v in rename_map.items() if k in table_df.columns}, inplace=True)
 
     def color_cpu(val):
-        if isinstance(val, (int, float)):
+        if isinstance(val, float):
             if val >= 85:   return "background-color:#3d1a1a; color:#ef4444; font-weight:700;"
             elif val >= 60: return "background-color:#3d2e10; color:#f59e0b; font-weight:700;"
             else:           return "background-color:#0f2d1a; color:#22c55e; font-weight:700;"
         return ""
 
     def color_mem(val):
-        if isinstance(val, (int, float)):
+        if isinstance(val, float):
             if val >= 88:   return "background-color:#3d1a1a; color:#ef4444; font-weight:700;"
             elif val >= 70: return "background-color:#3d2e10; color:#f59e0b; font-weight:700;"
             else:           return "background-color:#0f2d1a; color:#22c55e; font-weight:700;"
         return ""
 
     def color_disk(val):
-        if isinstance(val, (int, float)):
+        if isinstance(val, float):
             if val >= 90:   return "background-color:#3d1a1a; color:#ef4444; font-weight:700;"
             elif val >= 75: return "background-color:#3d2e10; color:#f59e0b; font-weight:700;"
             else:           return "background-color:#0f2d1a; color:#22c55e; font-weight:700;"
         return ""
 
-    def color_freq(val):
-        if isinstance(val, (int, float)):
-            return "color:#60a5fa; font-weight:600;"
-        return "color:#6b7280;"
-
-    def color_mem_gb(val):
-        if isinstance(val, (int, float)):
-            return "color:#a78bfa; font-weight:600;"
-        return "color:#6b7280;"
-
-    def color_disk_gb(val):
-        if isinstance(val, (int, float)):
-            return "color:#34d399; font-weight:600;"
-        return "color:#6b7280;"
-
-    def color_load(val):
-        if isinstance(val, (int, float)):
-            if val >= 2.0:   return "color:#ef4444; font-weight:700;"
-            elif val >= 1.0: return "color:#f59e0b; font-weight:600;"
-            else:            return "color:#22c55e;"
-        return "color:#6b7280;"
-
     def style_ts(val):
         return "color:#6b7280; font-size:12px;"
 
-    subset_map = {
-        "CPU %":         color_cpu,
-        "Memory %":      color_mem,
-        "Disk %":        color_disk,
-        "CPU MHz":       color_freq,
-        "Mem Used (GB)": color_mem_gb,
-        "Disk Used (GB)":color_disk_gb,
-        "Load 1m":       color_load,
-        "Load 5m":       color_load,
-        "Load 15m":      color_load,
-        "Timestamp":     style_ts,
-    }
-
-    styled = table_df.style
-    for col_name, fn in subset_map.items():
-        if col_name in table_df.columns:
-            styled = styled.applymap(fn, subset=[col_name])
-
-    styled = styled.set_table_styles([
-        {"selector": "thead th", "props": [
-            ("background-color", "#1a1d27"),
-            ("color", "#a5b4fc"),
-            ("font-family", "'Courier New', monospace"),
-            ("font-size", "11px"),
-            ("letter-spacing", "1.5px"),
-            ("text-transform", "uppercase"),
-            ("padding", "10px 14px"),
-            ("border-bottom", "2px solid #2a2d3e"),
-            ("text-align", "center"),
-        ]},
-        {"selector": "tbody tr:nth-child(even)", "props": [("background-color", "#141720")]},
-        {"selector": "tbody tr:nth-child(odd)",  "props": [("background-color", "#1a1d27")]},
-        {"selector": "tbody tr:hover",           "props": [("background-color", "#252840")]},
-        {"selector": "td", "props": [
-            ("padding", "9px 14px"),
-            ("font-size", "13px"),
-            ("font-family", "'Inter', sans-serif"),
-            ("text-align", "center"),
-            ("border-bottom", "1px solid #2a2d3e"),
-        ]},
-        {"selector": "table", "props": [("border-collapse", "collapse"), ("width", "100%")]},
-    ])
+    styled = table_df.style\
+        .applymap(color_cpu,  subset=["CPU %"]     if "CPU %"     in table_df.columns else [])\
+        .applymap(color_mem,  subset=["Memory %"]  if "Memory %"  in table_df.columns else [])\
+        .applymap(color_disk, subset=["Disk %"]    if "Disk %"    in table_df.columns else [])\
+        .applymap(style_ts,   subset=["Timestamp"] if "Timestamp" in table_df.columns else [])\
+        .set_table_styles([
+            {"selector": "thead th", "props": [
+                ("background-color", "#1a1d27"),
+                ("color", "#a5b4fc"),
+                ("font-family", "'Courier New', monospace"),
+                ("font-size", "11px"),
+                ("letter-spacing", "1.5px"),
+                ("text-transform", "uppercase"),
+                ("padding", "10px 14px"),
+                ("border-bottom", "2px solid #2a2d3e"),
+                ("text-align", "center"),
+            ]},
+            {"selector": "tbody tr:nth-child(even)", "props": [("background-color", "#141720")]},
+            {"selector": "tbody tr:nth-child(odd)",  "props": [("background-color", "#1a1d27")]},
+            {"selector": "tbody tr:hover",           "props": [("background-color", "#252840")]},
+            {"selector": "td", "props": [
+                ("padding", "9px 14px"),
+                ("font-size", "13px"),
+                ("font-family", "'Inter', sans-serif"),
+                ("text-align", "center"),
+                ("border-bottom", "1px solid #2a2d3e"),
+            ]},
+            {"selector": "table", "props": [("border-collapse", "collapse"), ("width", "100%")]},
+        ])
 
     st.markdown('<div class="card" style="padding:0; overflow:hidden;">', unsafe_allow_html=True)
     st.markdown("<div style='overflow-x:auto;'>" + styled.to_html(index=False) + "</div>", unsafe_allow_html=True)
