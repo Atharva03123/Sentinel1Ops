@@ -398,7 +398,7 @@ if rows:
         ])
 
     st.markdown('<div class="card" style="padding:0; overflow:hidden;">', unsafe_allow_html=True)
-    st.markdown("<div style='overflow-x:hidden;'>" + styled.to_html(index=False) + "</div>", unsafe_allow_html=True)
+    st.markdown("<div style='overflow-x:auto;'>" + styled.to_html(index=False) + "</div>", unsafe_allow_html=True)
     st.markdown('</div>', unsafe_allow_html=True)
 
     st.markdown("""
