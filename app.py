@@ -166,7 +166,7 @@ st.markdown(f"""
 </div>
 """, unsafe_allow_html=True)
 
-st.markdown("<div style='overflow-x:auto;'>" + styled.to_html(index=False) + "</div>", unsafe_allow_html=True)
+st.markdown("<div style='overflow-x:hidden;'>" + styled.to_html(index=False) + "</div>", unsafe_allow_html=True)
 
 # ─────────────────────────────
 # LIVE METRICS
@@ -398,9 +398,7 @@ if rows:
         ])
 
     st.markdown('<div class="card" style="padding:0; overflow:auto;">', unsafe_allow_html=True)
-    st.markdown("<div style='overflow-x:auto;'>" + styled.to_html(index=False) + "</div>", unsafe_allow_html=True)
-    st.markdown('</div>', unsafe_allow_html=True)
-
+    st.markdown("<div style='overflow-x:hidden;'>" + styled.to_html(index=False) + "</div>", unsafe_allow_html=True)
     st.markdown("""
     <div style="display:flex; gap:20px; margin-top:8px; margin-left:4px;">
         <span style="font-size:11px; color:#22c55e;">● Normal</span>
