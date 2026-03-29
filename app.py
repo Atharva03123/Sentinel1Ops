@@ -1,3 +1,14 @@
+
+import os
+import streamlit as st
+
+if "DATABASE_URL" in st.secrets:
+    os.environ["DATABASE_URL"] = st.secrets["DATABASE_URL"]
+
+st.set_page_config(
+    page_title="SentinelOps Dashboard",
+    
+)
 import streamlit as st
 
 # ✅ FIRST STREAMLIT COMMAND
