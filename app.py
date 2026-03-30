@@ -18,155 +18,120 @@ except Exception as e:
 # ─────────────────────────────
 st.set_page_config(
     page_title="SentinelOps Dashboard",
-    page_icon="🛡️",
     layout="wide",
     initial_sidebar_state="collapsed"
 )
 
+# ─────────────────────────────
+# GLOBAL STYLES
+# ─────────────────────────────
 st.markdown("""
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
-    html, body, [class*="css"] { font-family: 'Inter', sans-serif; }
+    @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Inter:wght@300;400;500;600;700&display=swap');
+
+    .stApp {
+        background-color: #0d1117;
+        color: #e6edf3;
+        font-family: 'Inter', sans-serif;
+    }
     #MainMenu {visibility: hidden;}
     footer {visibility: hidden;}
     header {visibility: hidden;}
-    .stApp { background-color: #0f1117; color: #e0e0e0; }
-    .block-container { padding-top: 2rem; padding-bottom: 2rem; padding-left: 2.5rem; padding-right: 2.5rem; }
-    .card { background: #1a1d27; border: 1px solid #2a2d3e; border-radius: 12px; padding: 20px 24px; margin-bottom: 8px; }
-    .card-title { font-size: 11px; font-weight: 600; letter-spacing: 1.2px; text-transform: uppercase; color: #6b7280; margin-bottom: 6px; }
-    .card-value { font-size: 32px; font-weight: 700; line-height: 1.1; margin-bottom: 2px; }
-    .card-sub { font-size: 12px; color: #6b7280; margin-top: 4px; }
-    .section-header { font-size: 13px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; color: #6b7280; margin-bottom: 12px; margin-top: 8px; }
-    .alert-critical { background: #2d1a1a; border-left: 4px solid #ef4444; border-radius: 8px; padding: 12px 16px; margin-bottom: 8px; font-size: 13px; }
-    .alert-warning { background: #2d2410; border-left: 4px solid #f59e0b; border-radius: 8px; padding: 12px 16px; margin-bottom: 8px; font-size: 13px; }
-    .alert-ok { background: #102d1a; border-left: 4px solid #22c55e; border-radius: 8px; padding: 12px 16px; font-size: 13px; }
-    .graph-label { font-size: 12px; font-weight: 600; letter-spacing: 0.8px; text-transform: uppercase; color: #6b7280; margin-bottom: 6px; }
-    .stButton > button { background: #2563eb; color: white; border: none; border-radius: 8px; padding: 8px 24px; font-weight: 600; font-size: 13px; letter-spacing: 0.5px; }
-    .stButton > button:hover { background: #1d4ed8; color: white; }
-    hr { border-color: #2a2d3e !important; margin: 24px 0 !important; }
+    .block-container {
+        padding-top: 2rem;
+        padding-bottom: 2rem;
+        padding-left: 3rem;
+        padding-right: 3rem;
+        max-width: 100%;
+    }
+    hr {
+        border: none;
+        border-top: 1px solid #21262d;
+        margin: 1.5rem 0;
+    }
+    h2, h3 {
+        color: #e6edf3 !important;
+        font-family: 'Inter', sans-serif !important;
+        font-weight: 600 !important;
+    }
+    [data-testid="stDataFrame"] {
+        border: 1px solid #30363d;
+        border-radius: 10px;
+        overflow: hidden;
+    }
+    .stButton > button {
+        background: #21262d;
+        color: #58a6ff;
+        border: 1px solid #30363d;
+        border-radius: 8px;
+        padding: 0.5rem 1.5rem;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.85rem;
+        font-weight: 600;
+        transition: all 0.2s ease;
+        letter-spacing: 0.05em;
+    }
+    .stButton > button:hover {
+        background: #30363d;
+        border-color: #58a6ff;
+        color: #79c0ff;
+    }
 </style>
 """, unsafe_allow_html=True)
-
-
-# ─────────────────────────────
-# LOGIN GATE
-# ─────────────────────────────
-def check_login():
-    if "authenticated" not in st.session_state:
-        st.session_state.authenticated = False
-
-    if not st.session_state.authenticated:
-        st.markdown("""
-        <div style="display:flex; flex-direction:column; align-items:center; margin-top:80px; margin-bottom:32px;">
-            <div style="display:flex; align-items:baseline; gap:0px;">
-                <span style="font-family:'Courier New',monospace; font-size:32px; font-weight:700; letter-spacing:6px; color:#a5b4fc;">SENTINEL</span>
-                <span style="font-family:'Courier New',monospace; font-size:32px; font-weight:700; letter-spacing:4px; color:#f472b6;">OPS</span>
-            </div>
-            <p style="color:#4b5563; font-family:'Courier New',monospace; font-size:10px; letter-spacing:3px; margin-top:6px;">SYSTEM ACCESS PORTAL</p>
-        </div>
-        """, unsafe_allow_html=True)
-
-        col1, col2, col3 = st.columns([1.5, 1, 1.5])
-        with col2:
-            st.markdown("""
-            <div class="card" style="padding:28px 24px;">
-                <div class="card-title" style="text-align:center; margin-bottom:16px;">🔐 &nbsp; Sign In</div>
-            </div>
-            """, unsafe_allow_html=True)
-            username = st.text_input("Username", placeholder="admin")
-            password = st.text_input("Password", type="password", placeholder="••••••••")
-            st.markdown("<div style='margin-top:8px;'></div>", unsafe_allow_html=True)
-            if st.button("Login", use_container_width=True):
-                if username == "admin" and password == "sentinel123":
-                    st.session_state.authenticated = True
-                    st.rerun()
-                else:
-                    st.error("Invalid username or password.")
-        st.stop()
-
-check_login()
-
-
-# ─────────────────────────────
-# HELPERS
-# ─────────────────────────────
-def metric_color(value, warn=60, crit=85):
-    if value >= crit:   return "#ef4444"
-    elif value >= warn: return "#f59e0b"
-    return "#22c55e"
-
-def health_color(score):
-    if score < 50:   return "#ef4444"
-    elif score < 70: return "#f59e0b"
-    return "#22c55e"
-
-def health_label(score):
-    if score < 50:   return "CRITICAL"
-    elif score < 70: return "WARNING"
-    return "NORMAL"
-
-def make_graph(df, col, color, ax):
-    ax.set_facecolor("#1a1d27")
-    ax.plot(df["collected_at"], df[col], color=color, linewidth=1.8, solid_capstyle='round')
-    ax.fill_between(df["collected_at"], df[col], alpha=0.12, color=color)
-    ax.set_ylim(0, 100)
-    ax.tick_params(colors="#6b7280", labelsize=8)
-    ax.xaxis.set_major_formatter(mdates.DateFormatter("%H:%M"))
-    ax.xaxis.set_major_locator(mdates.AutoDateLocator())
-    plt.setp(ax.get_xticklabels(), rotation=30, ha='right')
-    for spine in ax.spines.values():
-        spine.set_edgecolor("#2a2d3e")
-    ax.grid(True, color="#2a2d3e", linewidth=0.6, linestyle="--")
-    ax.tick_params(axis='y', colors="#6b7280")
-    ax.tick_params(axis='x', colors="#6b7280")
-
 
 # ─────────────────────────────
 # HEADER
 # ─────────────────────────────
-col_logo, col_refresh, col_logout = st.columns([5, 1, 1])
+col_logo, col_status = st.columns([3, 1])
+
 with col_logo:
     st.markdown("""
-    <div style="display:flex; align-items:center; gap:14px; margin-bottom:4px;">
-        <span style="font-size:30px; filter: drop-shadow(0 0 6px #6366f1);">🛡️</span>
+    <div style="display:flex; align-items:center; gap:12px; margin-bottom:4px;">
+        <span style="font-size:1.8rem;">🛡️</span>
         <div>
-            <div style="display:flex; align-items:baseline; gap:0px;">
-                <span style="font-family:'Courier New',monospace; font-size:26px; font-weight:700; letter-spacing:6px; color:#a5b4fc;">SENTINEL</span>
-                <span style="font-family:'Courier New',monospace; font-size:26px; font-weight:700; letter-spacing:4px; color:#f472b6;">OPS</span>
-            </div>
-            <div style="font-family:'Courier New',monospace; font-size:10px; color:#4b5563; letter-spacing:3px; margin-top:2px;">AUTOMATED SYSTEM HEALTH ENGINE</div>
+            <h1 style="margin:0; font-family:'Inter',sans-serif; font-weight:700;
+                       font-size:1.8rem; color:#e6edf3; letter-spacing:-0.02em;">
+                SentinelOps
+            </h1>
+            <p style="margin:0; color:#8b949e; font-size:0.8rem;
+                      font-family:'JetBrains Mono',monospace; letter-spacing:0.05em;">
+                AUTOMATED SYSTEM HEALTH ENGINE
+            </p>
         </div>
     </div>
     """, unsafe_allow_html=True)
 
-with col_refresh:
-    st.markdown("<div style='margin-top:10px;'></div>", unsafe_allow_html=True)
-    if st.button("⟳  Refresh"):
-        st.rerun()
+with col_status:
+    st.markdown("""
+    <div style="text-align:right; padding-top:8px;">
+        <span style="display:inline-block; padding:2px 10px; border-radius:20px;
+                     font-size:0.7rem; font-family:'JetBrains Mono',monospace;
+                     font-weight:600; letter-spacing:0.05em;
+                     background:#1a4a2e; color:#3fb950; border:1px solid #3fb950;">
+            ● LIVE
+        </span>
+    </div>
+    """, unsafe_allow_html=True)
 
-with col_logout:
-    st.markdown("<div style='margin-top:10px;'></div>", unsafe_allow_html=True)
-    if st.button("⎋  Logout"):
-        st.session_state.authenticated = False
-        st.rerun()
-
-st.markdown("<hr>", unsafe_allow_html=True)
+st.markdown("---")
 
 # ─────────────────────────────
 # SYSTEM INFO BAR
 # ─────────────────────────────
-st.markdown(f"""
-<div class="card" style="padding: 14px 24px;">
-    <div style="display:flex; gap:40px; flex-wrap:wrap; font-size:13px; color:#9ca3af;">
-        <span>💻 &nbsp;<b style="color:#cbd5e1;">ASUS VivoBook 16</b></span>
-        <span>🧠 &nbsp;<b style="color:#cbd5e1;">{round(psutil.virtual_memory().total/(1024**3),1)} GB RAM</b></span>
-        <span>⚙️ &nbsp;<b style="color:#cbd5e1;">{psutil.cpu_count(logical=False)} CPU Cores</b></span>
-        <span>🖥️ &nbsp;<b style="color:#cbd5e1;">{platform.system()} {platform.release()}</b></span>
-    </div>
-</div>
-""", unsafe_allow_html=True)
+col1, col2, col3, col4 = st.columns(4)
 
-st.markdown("<div style='margin-top:20px;'></div>", unsafe_allow_html=True)
+info_style = (
+    "background:#161b22; border:1px solid #21262d; border-radius:10px;"
+    "padding:0.6rem 1rem; font-family:'JetBrains Mono',monospace;"
+    "font-size:0.8rem; color:#8b949e;"
+)
+
+col1.markdown(f'<div style="{info_style}">💻 &nbsp;<span style="color:#e6edf3;">{platform.node()}</span></div>', unsafe_allow_html=True)
+col2.markdown(f'<div style="{info_style}">🧠 &nbsp;<span style="color:#e6edf3;">{round(psutil.virtual_memory().total/(1024**3),1)} GB RAM</span></div>', unsafe_allow_html=True)
+col3.markdown(f'<div style="{info_style}">⚙️ &nbsp;<span style="color:#e6edf3;">{psutil.cpu_count(logical=False)} CPU Cores</span></div>', unsafe_allow_html=True)
+col4.markdown(f'<div style="{info_style}">🖥️ &nbsp;<span style="color:#e6edf3;">{platform.system()} {platform.release()}</span></div>', unsafe_allow_html=True)
+
+st.markdown("<div style='margin:1.5rem 0;'></div>", unsafe_allow_html=True)
 
 # ─────────────────────────────
 # LIVE METRICS
@@ -184,37 +149,52 @@ health_score = 100 - (
 )
 health_score = round(health_score, 1)
 
-st.markdown('<div class="section-header">⚡ Live Metrics</div>', unsafe_allow_html=True)
+def get_color(value, thresholds=(60, 80)):
+    if value < thresholds[0]:
+        return "#3fb950"
+    elif value < thresholds[1]:
+        return "#e3b341"
+    else:
+        return "#f85149"
+
+def get_health_color(score):
+    if score >= 70:
+        return "#3fb950"
+    elif score >= 50:
+        return "#e3b341"
+    else:
+        return "#f85149"
+
+cpu_color    = get_color(data['cpu_percent'])
+mem_color    = get_color(data['memory_percent'])
+disk_color   = get_color(data['disk_percent'])
+health_color = get_health_color(health_score)
+
+st.markdown("### 📊 Live Metrics")
 
 m1, m2, m3, m4 = st.columns(4)
 
-for col, label, icon, val, unit, warn, crit in [
-    (m1, "CPU Usage",    "🔲", data['cpu_percent'],    "%", 60, 85),
-    (m2, "Memory Usage", "🧠", data['memory_percent'], "%", 70, 88),
-    (m3, "Disk Usage",   "💾", data['disk_percent'],   "%", 75, 90),
-]:
-    color = metric_color(val, warn, crit)
-    with col:
-        st.markdown(f"""
-        <div class="card">
-            <div class="card-title">{label}</div>
-            <div class="card-value" style="color:{color};">{val}{unit}</div>
-            <div class="card-sub">{icon} &nbsp;Live reading</div>
+def metric_card(col, label, value, unit, color, icon):
+    col.markdown(f"""
+    <div style="background:#161b22; border:1px solid #21262d; border-radius:14px;
+                padding:1.2rem 1.4rem; border-left:4px solid {color};">
+        <div style="font-family:'JetBrains Mono',monospace; font-size:0.7rem;
+                    color:#8b949e; text-transform:uppercase; letter-spacing:0.1em; margin-bottom:6px;">
+            {icon} &nbsp;{label}
         </div>
-        """, unsafe_allow_html=True)
-
-hcolor = health_color(health_score)
-hlabel = health_label(health_score)
-with m4:
-    st.markdown(f"""
-    <div class="card">
-        <div class="card-title">Health Score</div>
-        <div class="card-value" style="color:{hcolor};">{health_score}</div>
-        <div class="card-sub" style="color:{hcolor}; font-weight:600;">● {hlabel}</div>
+        <div style="font-family:'JetBrains Mono',monospace; font-size:2rem;
+                    font-weight:700; color:{color};">
+            {value}<span style="font-size:1rem; color:#8b949e;">{unit}</span>
+        </div>
     </div>
     """, unsafe_allow_html=True)
 
-st.markdown("<div style='margin-top:24px;'></div>", unsafe_allow_html=True)
+metric_card(m1, "CPU Usage",    data['cpu_percent'],    "%", cpu_color,    "🔲")
+metric_card(m2, "Memory",       data['memory_percent'], "%", mem_color,    "🧠")
+metric_card(m3, "Disk",         data['disk_percent'],   "%", disk_color,   "💾")
+metric_card(m4, "Health Score", health_score,           "",  health_color, "❤️")
+
+st.markdown("<div style='margin:1.5rem 0;'></div>", unsafe_allow_html=True)
 
 # ─────────────────────────────
 # FETCH DATA
@@ -228,217 +208,241 @@ except Exception as e:
 # ─────────────────────────────
 # GRAPHS
 # ─────────────────────────────
-st.markdown('<div class="section-header">📈 System Usage — Last 30 Minutes</div>', unsafe_allow_html=True)
-
 if rows:
     df = pd.DataFrame(rows)
-    df["collected_at"] = pd.to_datetime(df["collected_at"])
 
-    g1, g2, g3 = st.columns(3)
-    graph_specs = [
-        (g1, "CPU %",    "cpu_percent",    "#60a5fa"),
-        (g2, "Memory %", "memory_percent", "#a78bfa"),
-        (g3, "Disk %",   "disk_percent",   "#34d399"),
+    # FIX 1: Parse timestamps safely
+    if "collected_at" in df.columns:
+        df["collected_at"] = pd.to_datetime(df["collected_at"], errors="coerce")
+        df = df.dropna(subset=["collected_at"])
+        df = df.sort_values("collected_at")
+    else:
+        st.warning("⚠️ 'collected_at' column missing from database.")
+        df["collected_at"] = pd.Series(dtype="datetime64[ns]")
+
+    # FIX 2: Ensure numeric columns exist and are valid
+    for col_name in ["cpu_percent", "memory_percent", "disk_percent"]:
+        if col_name not in df.columns:
+            df[col_name] = 0
+        else:
+            df[col_name] = pd.to_numeric(df[col_name], errors="coerce").fillna(0)
+
+    st.markdown("### 📈 System Usage — Last 30 Minutes")
+
+    graph_configs = [
+        ("cpu_percent",    "CPU %",    "#58a6ff"),
+        ("memory_percent", "Memory %", "#3fb950"),
+        ("disk_percent",   "Disk %",   "#e3b341"),
     ]
 
-    for gcol, glabel, gkey, gcolor in graph_specs:
+    g1, g2, g3 = st.columns(3)
+    graph_cols = [g1, g2, g3]
+
+    plt.rcParams.update({
+        "figure.facecolor":  "#161b22",
+        "axes.facecolor":    "#0d1117",
+        "axes.edgecolor":    "#30363d",
+        "axes.labelcolor":   "#8b949e",
+        "xtick.color":       "#8b949e",
+        "ytick.color":       "#8b949e",
+        "grid.color":        "#21262d",
+        "text.color":        "#e6edf3",
+        "font.family":       "monospace",
+        "font.size":         8,
+    })
+
+    for gcol, (col_key, label, color) in zip(graph_cols, graph_configs):
         with gcol:
-            st.markdown(f'<div class="card"><div class="graph-label">{glabel}</div>', unsafe_allow_html=True)
+            st.markdown(f"""
+            <div style="font-family:'JetBrains Mono',monospace; font-size:0.72rem;
+                        color:#8b949e; text-transform:uppercase; letter-spacing:0.1em;
+                        margin-bottom:6px;">
+                {label}
+            </div>
+            """, unsafe_allow_html=True)
+
             fig, ax = plt.subplots(figsize=(4, 2.2))
-            fig.patch.set_facecolor("#1a1d27")
-            make_graph(df, gkey, gcolor, ax)
-            plt.tight_layout(pad=0.5)
+
+            if not df.empty and len(df) > 1:
+                ax.fill_between(df["collected_at"], df[col_key],
+                                alpha=0.15, color=color)
+                ax.plot(df["collected_at"], df[col_key],
+                        color=color, linewidth=1.5, zorder=3)
+                ax.scatter(df["collected_at"].iloc[-1], df[col_key].iloc[-1],
+                           color=color, s=40, zorder=4)
+                ax.xaxis.set_major_formatter(mdates.DateFormatter("%H:%M"))
+                ax.xaxis.set_major_locator(mdates.AutoDateLocator())
+                plt.setp(ax.xaxis.get_majorticklabels(), rotation=30, ha='right')
+            else:
+                ax.text(0.5, 0.5, "Not enough data", transform=ax.transAxes,
+                        ha='center', va='center', color="#8b949e", fontsize=9)
+
+            ax.set_ylim(0, 100)
+            ax.grid(True, alpha=0.4, linestyle='--')
+            ax.spines['top'].set_visible(False)
+            ax.spines['right'].set_visible(False)
+            fig.tight_layout()
+
             st.pyplot(fig)
             plt.close(fig)
-            st.markdown("</div>", unsafe_allow_html=True)
+
 else:
     st.markdown("""
-    <div class="card" style="text-align:center; color:#6b7280; padding:32px;">
-        ⚠️ &nbsp; No historical data available yet.
+    <div style="background:#161b22; border:1px solid #21262d; border-radius:12px;
+                padding:2rem; text-align:center; color:#8b949e;
+                font-family:'JetBrains Mono',monospace; font-size:0.85rem;">
+        ⚠️ &nbsp; No graph data available yet. Waiting for metrics to be collected...
     </div>
     """, unsafe_allow_html=True)
 
-st.markdown("<div style='margin-top:24px;'></div>", unsafe_allow_html=True)
-
-# ─────────────────────────────
-# FETCH ALERTS
-# ─────────────────────────────
-try:
-    alerts = db.fetch_recent_alerts(50)
-    alert_df = pd.DataFrame(alerts) if alerts else pd.DataFrame()
-except:
-    alert_df = pd.DataFrame()
+st.markdown("<div style='margin:1.5rem 0;'></div>", unsafe_allow_html=True)
 
 # ─────────────────────────────
 # STATUS CARDS
 # ─────────────────────────────
-st.markdown('<div class="section-header">🚨 System Status</div>', unsafe_allow_html=True)
+st.markdown("### 🔔 System Status")
 
-s1, s2, s3 = st.columns(3)
+try:
+    alerts = db.fetch_recent_alerts(50)
+    alert_df = pd.DataFrame(alerts) if alerts else pd.DataFrame()
+except Exception:
+    alert_df = pd.DataFrame()
 
-critical = len(alert_df[alert_df["severity"] == "CRITICAL"]) if not alert_df.empty else 0
-warning  = len(alert_df[alert_df["severity"] == "WARNING"])  if not alert_df.empty else 0
+# FIX 3: Safe column access for alerts
+if not alert_df.empty and "severity" in alert_df.columns:
+    critical = int((alert_df["severity"] == "CRITICAL").sum())
+    warning  = int((alert_df["severity"] == "WARNING").sum())
+else:
+    critical = 0
+    warning  = 0
 
-with s1:
-    ccolor = "#ef4444" if critical > 0 else "#22c55e"
-    st.markdown(f"""
-    <div class="card">
-        <div class="card-title">🔴 Critical Alerts</div>
-        <div class="card-value" style="color:{ccolor};">{critical}</div>
-        <div class="card-sub">Active critical issues</div>
+if health_score >= 70:
+    hs_label = "NORMAL"
+    hs_color = "#3fb950"
+elif health_score >= 50:
+    hs_label = "WARNING"
+    hs_color = "#e3b341"
+else:
+    hs_label = "CRITICAL"
+    hs_color = "#f85149"
+
+c1, c2, c3 = st.columns(3)
+
+def status_card(col, icon, label, value, color, sub=""):
+    col.markdown(f"""
+    <div style="background:#161b22; border:1px solid #21262d; border-radius:14px;
+                padding:1.2rem 1.4rem; text-align:center; border-top:3px solid {color};">
+        <div style="font-size:1.8rem; margin-bottom:4px;">{icon}</div>
+        <div style="font-family:'JetBrains Mono',monospace; font-size:0.7rem;
+                    color:#8b949e; text-transform:uppercase; letter-spacing:0.1em;">
+            {label}
+        </div>
+        <div style="font-family:'JetBrains Mono',monospace; font-size:1.8rem;
+                    font-weight:700; color:{color}; margin:4px 0;">
+            {value}
+        </div>
+        {f'<div style="font-size:0.75rem; color:#8b949e;">{sub}</div>' if sub else ''}
     </div>
     """, unsafe_allow_html=True)
 
-with s2:
-    wcolor = "#f59e0b" if warning > 0 else "#22c55e"
-    st.markdown(f"""
-    <div class="card">
-        <div class="card-title">🟡 Warnings</div>
-        <div class="card-value" style="color:{wcolor};">{warning}</div>
-        <div class="card-sub">Active warnings</div>
-    </div>
-    """, unsafe_allow_html=True)
+status_card(c1, "🚨", "Critical Alerts", critical, "#f85149", "last 50 alerts")
+status_card(c2, "⚠️", "Warnings",        warning,  "#e3b341", "last 50 alerts")
+status_card(c3, "❤️", "Health Status",   hs_label, hs_color,  f"score: {health_score}")
 
-with s3:
-    st.markdown(f"""
-    <div class="card">
-        <div class="card-title">🟢 Health Status</div>
-        <div class="card-value" style="color:{hcolor};">{hlabel}</div>
-        <div class="card-sub">Score: {health_score} / 100</div>
-    </div>
-    """, unsafe_allow_html=True)
-
-st.markdown("<div style='margin-top:24px;'></div>", unsafe_allow_html=True)
+st.markdown("<div style='margin:1.5rem 0;'></div>", unsafe_allow_html=True)
 
 # ─────────────────────────────
 # DATA TABLE
 # ─────────────────────────────
-st.markdown('<div class="section-header">🗃️ Raw Metrics — Last 30 Minutes</div>', unsafe_allow_html=True)
+st.markdown("### 🗃️ Last 30 Minutes — Raw Data")
 
 if rows:
     table_df = pd.DataFrame(rows)
-    table_df["collected_at"] = pd.to_datetime(table_df["collected_at"]).dt.strftime("%Y-%m-%d %H:%M:%S")
-    table_df = table_df.round(2)
 
-    # Keep only important columns — hide None columns
-    keep_cols = [c for c in ["collected_at", "cpu_percent", "memory_percent", "disk_percent"] if c in table_df.columns]
-    table_df = table_df[keep_cols]
+    # FIX 4: Safe datetime parsing for table
+    if "collected_at" in table_df.columns:
+        table_df["collected_at"] = pd.to_datetime(table_df["collected_at"], errors="coerce")
 
-    rename_map = {
-        "collected_at": "Timestamp",
-        "cpu_percent": "CPU %",
-        "memory_percent": "Memory %",
-        "disk_percent": "Disk %",
-    }
-    table_df.rename(columns={k: v for k, v in rename_map.items() if k in table_df.columns}, inplace=True)
+    # FIX 5: Only round numeric columns
+    numeric_cols = table_df.select_dtypes(include="number").columns
+    if len(numeric_cols) > 0:
+        table_df[numeric_cols] = table_df[numeric_cols].round(2)
 
-    def color_cpu(val):
-        if isinstance(val, float):
-            if val >= 85:   return "background-color:#3d1a1a; color:#ef4444; font-weight:700;"
-            elif val >= 60: return "background-color:#3d2e10; color:#f59e0b; font-weight:700;"
-            else:           return "background-color:#0f2d1a; color:#22c55e; font-weight:700;"
-        return ""
-
-    def color_mem(val):
-        if isinstance(val, float):
-            if val >= 88:   return "background-color:#3d1a1a; color:#ef4444; font-weight:700;"
-            elif val >= 70: return "background-color:#3d2e10; color:#f59e0b; font-weight:700;"
-            else:           return "background-color:#0f2d1a; color:#22c55e; font-weight:700;"
-        return ""
-
-    def color_disk(val):
-        if isinstance(val, float):
-            if val >= 90:   return "background-color:#3d1a1a; color:#ef4444; font-weight:700;"
-            elif val >= 75: return "background-color:#3d2e10; color:#f59e0b; font-weight:700;"
-            else:           return "background-color:#0f2d1a; color:#22c55e; font-weight:700;"
-        return ""
-
-    def style_ts(val):
-        return "color:#6b7280; font-size:12px;"
-
-    styled = table_df.style\
-        .applymap(color_cpu,  subset=["CPU %"]     if "CPU %"     in table_df.columns else [])\
-        .applymap(color_mem,  subset=["Memory %"]  if "Memory %"  in table_df.columns else [])\
-        .applymap(color_disk, subset=["Disk %"]    if "Disk %"    in table_df.columns else [])\
-        .applymap(style_ts,   subset=["Timestamp"] if "Timestamp" in table_df.columns else [])\
-        .set_table_styles([
-            {"selector": "thead th", "props": [
-                ("background-color", "#1a1d27"),
-                ("color", "#a5b4fc"),
-                ("font-family", "'Courier New', monospace"),
-                ("font-size", "11px"),
-                ("letter-spacing", "1.5px"),
-                ("text-transform", "uppercase"),
-                ("padding", "10px 14px"),
-                ("border-bottom", "2px solid #2a2d3e"),
-                ("text-align", "center"),
-            ]},
-            {"selector": "tbody tr:nth-child(even)", "props": [("background-color", "#141720")]},
-            {"selector": "tbody tr:nth-child(odd)",  "props": [("background-color", "#1a1d27")]},
-            {"selector": "tbody tr:hover",           "props": [("background-color", "#252840")]},
-            {"selector": "td", "props": [
-                ("padding", "9px 14px"),
-                ("font-size", "13px"),
-                ("font-family", "'Inter', sans-serif"),
-                ("text-align", "center"),
-                ("border-bottom", "1px solid #2a2d3e"),
-            ]},
-            {"selector": "table", "props": [("border-collapse", "collapse"), ("width", "100%")]},
-        ])
-
-    st.markdown('<div class="card" style="padding:0; overflow:hidden;">', unsafe_allow_html=True)
-    st.markdown("<div style='overflow-x:auto;'>" + styled.to_html(index=False) + "</div>", unsafe_allow_html=True)
-    st.markdown('</div>', unsafe_allow_html=True)
-
-    st.markdown("""
-    <div style="display:flex; gap:20px; margin-top:8px; margin-left:4px;">
-        <span style="font-size:11px; color:#22c55e;">● Normal</span>
-        <span style="font-size:11px; color:#f59e0b;">● Warning</span>
-        <span style="font-size:11px; color:#ef4444;">● Critical</span>
-    </div>
-    """, unsafe_allow_html=True)
-
+    st.dataframe(
+        table_df,
+        use_container_width=True,
+        height=400,
+        hide_index=True,
+    )
 else:
     st.markdown("""
-    <div class="card" style="text-align:center; color:#6b7280; padding:32px;">
-        ⚠️ &nbsp; No data available.
+    <div style="background:#161b22; border:1px solid #21262d; border-radius:12px;
+                padding:2rem; text-align:center; color:#8b949e;
+                font-family:'JetBrains Mono',monospace; font-size:0.85rem;">
+        ⚠️ &nbsp; No data found in database yet.
     </div>
     """, unsafe_allow_html=True)
 
-st.markdown("<div style='margin-top:24px;'></div>", unsafe_allow_html=True)
+st.markdown("<div style='margin:1.5rem 0;'></div>", unsafe_allow_html=True)
 
 # ─────────────────────────────
 # RECENT ALERTS
 # ─────────────────────────────
-st.markdown('<div class="section-header">📋 Recent Alerts</div>', unsafe_allow_html=True)
+st.markdown("### 📋 Recent Alerts")
 
 if not alert_df.empty:
-    for a in alert_df.head(5).to_dict("records"):
-        sev = a['severity']
-        css_class = "alert-critical" if sev == "CRITICAL" else "alert-warning"
-        icon = "🔴" if sev == "CRITICAL" else "🟡"
-        st.markdown(f"""
-        <div class="{css_class}">
-            {icon} &nbsp;<b>{sev}</b> &nbsp;·&nbsp;
-            <span style="color:#cbd5e1;">{a['component']}</span>
-            <span style="color:#9ca3af;"> → {a['message']}</span>
-        </div>
-        """, unsafe_allow_html=True)
+    required_cols = {"severity", "component", "message"}
+
+    if required_cols.issubset(alert_df.columns):
+        for a in alert_df.head(5).to_dict("records"):
+            severity  = str(a.get("severity", "INFO"))
+            component = str(a.get("component", "unknown"))
+            message   = str(a.get("message", ""))
+
+            if severity == "CRITICAL":
+                icon, color = "🔴", "#f85149"
+            elif severity == "WARNING":
+                icon, color = "🟡", "#e3b341"
+            else:
+                icon, color = "🔵", "#58a6ff"
+
+            st.markdown(f"""
+            <div style="background:#161b22; border:1px solid #21262d; border-left:4px solid {color};
+                        border-radius:10px; padding:0.8rem 1.2rem; margin-bottom:0.5rem;
+                        font-family:'JetBrains Mono',monospace; font-size:0.82rem; color:#e6edf3;">
+                {icon} &nbsp;<span style="color:{color}; font-weight:700;">[{severity}]</span>
+                &nbsp;<span style="color:#8b949e;">{component}</span>
+                &nbsp;→&nbsp; {message}
+            </div>
+            """, unsafe_allow_html=True)
+    else:
+        # FIX 6: Handle missing columns gracefully
+        missing = required_cols - set(alert_df.columns)
+        st.warning(f"⚠️ Alert table missing columns: {missing}. Showing raw data.")
+        st.dataframe(alert_df.head(5), use_container_width=True, hide_index=True)
 else:
     st.markdown("""
-    <div class="alert-ok">
-        ✅ &nbsp; <b>All systems nominal.</b> &nbsp; No active alerts.
+    <div style="background:#1a2d1e; border:1px solid #3fb950; border-radius:10px;
+                padding:0.8rem 1.2rem; font-family:'JetBrains Mono',monospace;
+                font-size:0.82rem; color:#3fb950;">
+        ✅ &nbsp; No active alerts — system running normally.
     </div>
     """, unsafe_allow_html=True)
 
+st.markdown("<div style='margin:2rem 0 1rem;'></div>", unsafe_allow_html=True)
+
 # ─────────────────────────────
-# FOOTER
+# FOOTER + REFRESH
 # ─────────────────────────────
-st.markdown("<hr>", unsafe_allow_html=True)
-st.markdown("""
-<div style="text-align:center; padding-bottom:8px;">
-    <span style="font-family:'Courier New',monospace; font-size:11px; color:#374151; letter-spacing:3px;">
-        SENTINELOPS &nbsp;·&nbsp; AUTOMATED SYSTEM HEALTH ENGINE &nbsp;·&nbsp; BUILT WITH PYTHON &amp; STREAMLIT
-    </span>
-</div>
-""", unsafe_allow_html=True)
+fcol1, fcol2 = st.columns([1, 5])
+with fcol1:
+    if st.button("🔄  Refresh"):
+        st.rerun()
+
+with fcol2:
+    st.markdown("""
+    <div style="padding-top:10px; font-family:'JetBrains Mono',monospace;
+                font-size:0.72rem; color:#30363d;">
+        SentinelOps · Built with Python, PostgreSQL &amp; Streamlit
+    </div>
+    """, unsafe_allow_html=True)
