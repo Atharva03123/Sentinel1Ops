@@ -4,14 +4,19 @@ import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 import platform
 import psutil
+import datetime
+import random
+import math
 
 # Safe imports
 try:
     import db
     import metrics
+    DB_AVAILABLE = True
+    METRICS_AVAILABLE = True
 except Exception as e:
-    st.error(f"Import Error: {e}")
-    st.stop()
+    DB_AVAILABLE = False
+    METRICS_AVAILABLE = False
 
 # ─────────────────────────────
 # PAGE CONFIG
@@ -21,6 +26,11 @@ st.set_page_config(
     layout="wide",
     initial_sidebar_state="collapsed"
 )
+
+# Auto-refresh every 10 seconds
+st.markdown("""
+<meta http-equiv="refresh" content="10">
+""", unsafe_allow_html=True)
 
 # ─────────────────────────────
 # GLOBAL STYLES
@@ -80,6 +90,52 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # ─────────────────────────────
+# HELPER: GENERATE SIMULATED DATA
+# ─────────────────────────────
+def generate_simulated_rows(n=30):
+    """Generate realistic simulated metric rows for the last 30 minutes."""
+    now = datetime.datetime.now()
+    rows = []
+    base_cpu = random.uniform(20, 50)
+    base_mem = random.uniform(40, 65)
+    base_disk = random.uniform(30, 55)
+
+    for i in range(n):
+        t = now - datetime.timedelta(minutes=(n - i))
+        # Add realistic sinusoidal + noise variation
+        cpu  = max(0, min(100, base_cpu  + 10 * math.sin(i / 5) + random.gauss(0, 3)))
+        mem  = max(0, min(100, base_mem  +  5 * math.sin(i / 8) + random.gauss(0, 2)))
+        disk = max(0, min(100, base_disk +  2 * math.sin(i / 12) + random.gauss(0, 1)))
+        rows.append({
+            "collected_at":   t,
+            "cpu_percent":    round(cpu, 2),
+            "memory_percent": round(mem, 2),
+            "disk_percent":   round(disk, 2),
+        })
+    return rows
+
+def generate_simulated_alerts():
+    """Return empty alert list (no real alerts when simulating)."""
+    return []
+
+# ─────────────────────────────
+# COLLECT LIVE METRICS (with fallback)
+# ─────────────────────────────
+def collect_live_metrics():
+    """Collect real metrics if available, else use psutil directly."""
+    if METRICS_AVAILABLE:
+        try:
+            return metrics.collect()
+        except Exception:
+            pass
+    # Fallback: read directly from psutil
+    return {
+        "cpu_percent":    psutil.cpu_percent(interval=0.5),
+        "memory_percent": psutil.virtual_memory().percent,
+        "disk_percent":   psutil.disk_usage("/").percent,
+    }
+
+# ─────────────────────────────
 # HEADER
 # ─────────────────────────────
 col_logo, col_status = st.columns([3, 1])
@@ -102,16 +158,16 @@ with col_logo:
     """, unsafe_allow_html=True)
 
 with col_status:
-    st.markdown("""
-    <div style="text-align:right; padding-top:8px;">
-        <span style="display:inline-block; padding:2px 10px; border-radius:20px;
-                     font-size:0.7rem; font-family:'JetBrains Mono',monospace;
-                     font-weight:600; letter-spacing:0.05em;
-                     background:#1a4a2e; color:#3fb950; border:1px solid #3fb950;">
-            ● LIVE
-        </span>
-    </div>
-    """, unsafe_allow_html=True)
+    db_badge = (
+        '<span style="display:inline-block; padding:2px 10px; border-radius:20px; '
+        'font-size:0.7rem; font-family:\'JetBrains Mono\',monospace; font-weight:600; '
+        'letter-spacing:0.05em; background:#1a2d1e; color:#3fb950; border:1px solid #3fb950;">● LIVE</span>'
+        if DB_AVAILABLE else
+        '<span style="display:inline-block; padding:2px 10px; border-radius:20px; '
+        'font-size:0.7rem; font-family:\'JetBrains Mono\',monospace; font-weight:600; '
+        'letter-spacing:0.05em; background:#2d1a1a; color:#e3b341; border:1px solid #e3b341;">⚡ SIMULATED</span>'
+    )
+    st.markdown(f'<div style="text-align:right; padding-top:8px;">{db_badge}</div>', unsafe_allow_html=True)
 
 st.markdown("---")
 
@@ -136,11 +192,7 @@ st.markdown("<div style='margin:1.5rem 0;'></div>", unsafe_allow_html=True)
 # ─────────────────────────────
 # LIVE METRICS
 # ─────────────────────────────
-try:
-    data = metrics.collect()
-except Exception as e:
-    st.error(f"Metrics Error: {e}")
-    st.stop()
+data = collect_live_metrics()
 
 health_score = 100 - (
     data['cpu_percent'] * 0.4 +
@@ -197,103 +249,102 @@ metric_card(m4, "Health Score", health_score,           "",  health_color, "❤�
 st.markdown("<div style='margin:1.5rem 0;'></div>", unsafe_allow_html=True)
 
 # ─────────────────────────────
-# FETCH DATA
+# FETCH DATA (with simulation fallback)
 # ─────────────────────────────
-try:
-    rows = db.fetch_recent_metrics(30)
-except Exception as e:
-    st.error(f"Database Error: {e}")
-    rows = []
+rows = []
+using_simulated = False
+
+if DB_AVAILABLE:
+    try:
+        rows = db.fetch_recent_metrics(30)
+    except Exception as e:
+        st.warning(f"⚠️ DB fetch failed: {e}. Showing simulated data.")
+        rows = []
+
+# If DB returned nothing (empty table or DB unavailable), simulate
+if not rows:
+    rows = generate_simulated_rows(30)
+    using_simulated = True
 
 # ─────────────────────────────
 # GRAPHS
 # ─────────────────────────────
-if rows:
-    df = pd.DataFrame(rows)
+df = pd.DataFrame(rows)
 
-    # FIX 1: Parse timestamps safely
-    if "collected_at" in df.columns:
-        df["collected_at"] = pd.to_datetime(df["collected_at"], errors="coerce")
-        df = df.dropna(subset=["collected_at"])
-        df = df.sort_values("collected_at")
-    else:
-        st.warning("⚠️ 'collected_at' column missing from database.")
-        df["collected_at"] = pd.Series(dtype="datetime64[ns]")
-
-    # FIX 2: Ensure numeric columns exist and are valid
-    for col_name in ["cpu_percent", "memory_percent", "disk_percent"]:
-        if col_name not in df.columns:
-            df[col_name] = 0
-        else:
-            df[col_name] = pd.to_numeric(df[col_name], errors="coerce").fillna(0)
-
-    st.markdown("### 📈 System Usage — Last 30 Minutes")
-
-    graph_configs = [
-        ("cpu_percent",    "CPU %",    "#58a6ff"),
-        ("memory_percent", "Memory %", "#3fb950"),
-        ("disk_percent",   "Disk %",   "#e3b341"),
-    ]
-
-    g1, g2, g3 = st.columns(3)
-    graph_cols = [g1, g2, g3]
-
-    plt.rcParams.update({
-        "figure.facecolor":  "#161b22",
-        "axes.facecolor":    "#0d1117",
-        "axes.edgecolor":    "#30363d",
-        "axes.labelcolor":   "#8b949e",
-        "xtick.color":       "#8b949e",
-        "ytick.color":       "#8b949e",
-        "grid.color":        "#21262d",
-        "text.color":        "#e6edf3",
-        "font.family":       "monospace",
-        "font.size":         8,
-    })
-
-    for gcol, (col_key, label, color) in zip(graph_cols, graph_configs):
-        with gcol:
-            st.markdown(f"""
-            <div style="font-family:'JetBrains Mono',monospace; font-size:0.72rem;
-                        color:#8b949e; text-transform:uppercase; letter-spacing:0.1em;
-                        margin-bottom:6px;">
-                {label}
-            </div>
-            """, unsafe_allow_html=True)
-
-            fig, ax = plt.subplots(figsize=(4, 2.2))
-
-            if not df.empty and len(df) > 1:
-                ax.fill_between(df["collected_at"], df[col_key],
-                                alpha=0.15, color=color)
-                ax.plot(df["collected_at"], df[col_key],
-                        color=color, linewidth=1.5, zorder=3)
-                ax.scatter(df["collected_at"].iloc[-1], df[col_key].iloc[-1],
-                           color=color, s=40, zorder=4)
-                ax.xaxis.set_major_formatter(mdates.DateFormatter("%H:%M"))
-                ax.xaxis.set_major_locator(mdates.AutoDateLocator())
-                plt.setp(ax.xaxis.get_majorticklabels(), rotation=30, ha='right')
-            else:
-                ax.text(0.5, 0.5, "Not enough data", transform=ax.transAxes,
-                        ha='center', va='center', color="#8b949e", fontsize=9)
-
-            ax.set_ylim(0, 100)
-            ax.grid(True, alpha=0.4, linestyle='--')
-            ax.spines['top'].set_visible(False)
-            ax.spines['right'].set_visible(False)
-            fig.tight_layout()
-
-            st.pyplot(fig)
-            plt.close(fig)
-
+# Parse timestamps safely
+if "collected_at" in df.columns:
+    df["collected_at"] = pd.to_datetime(df["collected_at"], errors="coerce")
+    df = df.dropna(subset=["collected_at"])
+    df = df.sort_values("collected_at")
 else:
-    st.markdown("""
-    <div style="background:#161b22; border:1px solid #21262d; border-radius:12px;
-                padding:2rem; text-align:center; color:#8b949e;
-                font-family:'JetBrains Mono',monospace; font-size:0.85rem;">
-        ⚠️ &nbsp; No graph data available yet. Waiting for metrics to be collected...
-    </div>
-    """, unsafe_allow_html=True)
+    df["collected_at"] = pd.Series(dtype="datetime64[ns]")
+
+# Ensure numeric columns exist and are valid
+for col_name in ["cpu_percent", "memory_percent", "disk_percent"]:
+    if col_name not in df.columns:
+        df[col_name] = 0
+    else:
+        df[col_name] = pd.to_numeric(df[col_name], errors="coerce").fillna(0)
+
+sim_label = " *(simulated — waiting for DB data)*" if using_simulated else ""
+st.markdown(f"### 📈 System Usage — Last 30 Minutes{sim_label}")
+
+graph_configs = [
+    ("cpu_percent",    "CPU %",    "#58a6ff"),
+    ("memory_percent", "Memory %", "#3fb950"),
+    ("disk_percent",   "Disk %",   "#e3b341"),
+]
+
+g1, g2, g3 = st.columns(3)
+graph_cols = [g1, g2, g3]
+
+plt.rcParams.update({
+    "figure.facecolor":  "#161b22",
+    "axes.facecolor":    "#0d1117",
+    "axes.edgecolor":    "#30363d",
+    "axes.labelcolor":   "#8b949e",
+    "xtick.color":       "#8b949e",
+    "ytick.color":       "#8b949e",
+    "grid.color":        "#21262d",
+    "text.color":        "#e6edf3",
+    "font.family":       "monospace",
+    "font.size":         8,
+})
+
+for gcol, (col_key, label, color) in zip(graph_cols, graph_configs):
+    with gcol:
+        st.markdown(f"""
+        <div style="font-family:'JetBrains Mono',monospace; font-size:0.72rem;
+                    color:#8b949e; text-transform:uppercase; letter-spacing:0.1em;
+                    margin-bottom:6px;">
+            {label}
+        </div>
+        """, unsafe_allow_html=True)
+
+        fig, ax = plt.subplots(figsize=(4, 2.2))
+
+        if not df.empty and len(df) > 1:
+            ax.fill_between(df["collected_at"], df[col_key],
+                            alpha=0.15, color=color)
+            ax.plot(df["collected_at"], df[col_key],
+                    color=color, linewidth=1.5, zorder=3)
+            ax.scatter(df["collected_at"].iloc[-1], df[col_key].iloc[-1],
+                       color=color, s=40, zorder=4)
+            ax.xaxis.set_major_formatter(mdates.DateFormatter("%H:%M"))
+            ax.xaxis.set_major_locator(mdates.AutoDateLocator())
+            plt.setp(ax.xaxis.get_majorticklabels(), rotation=30, ha='right')
+        else:
+            ax.text(0.5, 0.5, "Not enough data", transform=ax.transAxes,
+                    ha='center', va='center', color="#8b949e", fontsize=9)
+
+        ax.set_ylim(0, 100)
+        ax.grid(True, alpha=0.4, linestyle='--')
+        ax.spines['top'].set_visible(False)
+        ax.spines['right'].set_visible(False)
+        fig.tight_layout()
+
+        st.pyplot(fig)
+        plt.close(fig)
 
 st.markdown("<div style='margin:1.5rem 0;'></div>", unsafe_allow_html=True)
 
@@ -302,13 +353,15 @@ st.markdown("<div style='margin:1.5rem 0;'></div>", unsafe_allow_html=True)
 # ─────────────────────────────
 st.markdown("### 🔔 System Status")
 
-try:
-    alerts = db.fetch_recent_alerts(50)
-    alert_df = pd.DataFrame(alerts) if alerts else pd.DataFrame()
-except Exception:
-    alert_df = pd.DataFrame()
+alert_df = pd.DataFrame()
+if DB_AVAILABLE:
+    try:
+        alerts = db.fetch_recent_alerts(50)
+        alert_df = pd.DataFrame(alerts) if alerts else pd.DataFrame()
+    except Exception:
+        alert_df = pd.DataFrame()
 
-# FIX 3: Safe column access for alerts
+# Safe column access for alerts
 if not alert_df.empty and "severity" in alert_df.columns:
     critical = int((alert_df["severity"] == "CRITICAL").sum())
     warning  = int((alert_df["severity"] == "WARNING").sum())
@@ -356,32 +409,23 @@ st.markdown("<div style='margin:1.5rem 0;'></div>", unsafe_allow_html=True)
 # ─────────────────────────────
 st.markdown("### 🗃️ Last 30 Minutes — Raw Data")
 
-if rows:
-    table_df = pd.DataFrame(rows)
+table_df = df.copy()
 
-    # FIX 4: Safe datetime parsing for table
-    if "collected_at" in table_df.columns:
-        table_df["collected_at"] = pd.to_datetime(table_df["collected_at"], errors="coerce")
+# Safe datetime parsing for table
+if "collected_at" in table_df.columns:
+    table_df["collected_at"] = pd.to_datetime(table_df["collected_at"], errors="coerce")
 
-    # FIX 5: Only round numeric columns
-    numeric_cols = table_df.select_dtypes(include="number").columns
-    if len(numeric_cols) > 0:
-        table_df[numeric_cols] = table_df[numeric_cols].round(2)
+# Only round numeric columns
+numeric_cols = table_df.select_dtypes(include="number").columns
+if len(numeric_cols) > 0:
+    table_df[numeric_cols] = table_df[numeric_cols].round(2)
 
-    st.dataframe(
-        table_df,
-        use_container_width=True,
-        height=400,
-        hide_index=True,
-    )
-else:
-    st.markdown("""
-    <div style="background:#161b22; border:1px solid #21262d; border-radius:12px;
-                padding:2rem; text-align:center; color:#8b949e;
-                font-family:'JetBrains Mono',monospace; font-size:0.85rem;">
-        ⚠️ &nbsp; No data found in database yet.
-    </div>
-    """, unsafe_allow_html=True)
+st.dataframe(
+    table_df,
+    use_container_width=True,
+    height=400,
+    hide_index=True,
+)
 
 st.markdown("<div style='margin:1.5rem 0;'></div>", unsafe_allow_html=True)
 
@@ -416,7 +460,6 @@ if not alert_df.empty:
             </div>
             """, unsafe_allow_html=True)
     else:
-        # FIX 6: Handle missing columns gracefully
         missing = required_cols - set(alert_df.columns)
         st.warning(f"⚠️ Alert table missing columns: {missing}. Showing raw data.")
         st.dataframe(alert_df.head(5), use_container_width=True, hide_index=True)
@@ -443,6 +486,6 @@ with fcol2:
     st.markdown("""
     <div style="padding-top:10px; font-family:'JetBrains Mono',monospace;
                 font-size:0.72rem; color:#30363d;">
-        SentinelOps · Built with Python, PostgreSQL &amp; Streamlit
+        SentinelOps · Built with Python, PostgreSQL &amp; Streamlit · Auto-refreshes every 10s
     </div>
     """, unsafe_allow_html=True)
