@@ -41,18 +41,19 @@ if "logged_in" not in st.session_state:
     st.session_state.logged_in = False
 
 if not st.session_state.logged_in:
-    st.markdown("""
-    <div style="display:flex; justify-content:center; align-items:center; height:100vh; background:#0d1117;">
-    </div>
-    """, unsafe_allow_html=True)
     st.markdown("<br><br><br>", unsafe_allow_html=True)
-    col1, col2, col3 = st.columns([2,1,2])
+    col1, col2, col3 = st.columns([1.5, 1, 1.5])
     with col2:
-        st.markdown("<h2 style='text-align:center; color:#e6edf3; font-family:Inter,sans-serif;'>🛡️ SentinelOps</h2>", unsafe_allow_html=True)
-        st.markdown("<p style='text-align:center; color:#8b949e; font-size:0.8rem;'>Enter credentials to continue</p>", unsafe_allow_html=True)
+        st.markdown("""
+        <div style='text-align:center; margin-bottom:1.5rem;'>
+            <span style='font-size:3rem;'>🛡️</span>
+            <h2 style='color:#e6edf3; font-family:Inter,sans-serif; margin:0.5rem 0 0.2rem;'>SentinelOps</h2>
+            <p style='color:#8b949e; font-size:0.8rem; margin:0;'>Enter credentials to continue</p>
+        </div>
+        """, unsafe_allow_html=True)
         username = st.text_input("Username", placeholder="admin")
         password = st.text_input("Password", type="password", placeholder="••••••••")
-        if st.button("Login", use_container_width=True):
+        if st.button("🔐  Login", use_container_width=True):
             if username == "admin" and password == "sentinel123":
                 st.session_state.logged_in = True
                 st.rerun()
