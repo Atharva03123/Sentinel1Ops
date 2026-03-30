@@ -7,6 +7,8 @@ import psutil
 import datetime
 import random
 import math
+import threading
+import time
 
 # Safe imports
 try:
@@ -19,6 +21,26 @@ except Exception as e:
     METRICS_AVAILABLE = False
 
 # ─────────────────────────────
+# BACKGROUND COLLECTOR THREAD
+# ─────────────────────────────
+def run_collector():
+    """Har 5 second mein metrics collect karke DB mein insert karta hai."""
+    while True:
+        try:
+            if DB_AVAILABLE and METRICS_AVAILABLE:
+                data = metrics.collect()
+                db.insert_metric(data)
+        except Exception:
+            pass
+        time.sleep(5)
+
+# Sirf ek baar thread start ho
+if "collector_started" not in st.session_state:
+    t = threading.Thread(target=run_collector, daemon=True)
+    t.start()
+    st.session_state.collector_started = True
+
+# ─────────────────────────────
 # PAGE CONFIG
 # ─────────────────────────────
 st.set_page_config(
@@ -26,11 +48,6 @@ st.set_page_config(
     layout="wide",
     initial_sidebar_state="collapsed"
 )
-
-# Auto-refresh every 10 seconds
-st.markdown("""
-<meta http-equiv="refresh" content="10">
-""", unsafe_allow_html=True)
 
 # ─────────────────────────────
 # GLOBAL STYLES
@@ -93,16 +110,13 @@ st.markdown("""
 # HELPER: GENERATE SIMULATED DATA
 # ─────────────────────────────
 def generate_simulated_rows(n=30):
-    """Generate realistic simulated metric rows for the last 30 minutes."""
     now = datetime.datetime.now()
     rows = []
     base_cpu = random.uniform(20, 50)
     base_mem = random.uniform(40, 65)
     base_disk = random.uniform(30, 55)
-
     for i in range(n):
         t = now - datetime.timedelta(minutes=(n - i))
-        # Add realistic sinusoidal + noise variation
         cpu  = max(0, min(100, base_cpu  + 10 * math.sin(i / 5) + random.gauss(0, 3)))
         mem  = max(0, min(100, base_mem  +  5 * math.sin(i / 8) + random.gauss(0, 2)))
         disk = max(0, min(100, base_disk +  2 * math.sin(i / 12) + random.gauss(0, 1)))
@@ -114,21 +128,15 @@ def generate_simulated_rows(n=30):
         })
     return rows
 
-def generate_simulated_alerts():
-    """Return empty alert list (no real alerts when simulating)."""
-    return []
-
 # ─────────────────────────────
-# COLLECT LIVE METRICS (with fallback)
+# COLLECT LIVE METRICS
 # ─────────────────────────────
 def collect_live_metrics():
-    """Collect real metrics if available, else use psutil directly."""
     if METRICS_AVAILABLE:
         try:
             return metrics.collect()
         except Exception:
             pass
-    # Fallback: read directly from psutil
     return {
         "cpu_percent":    psutil.cpu_percent(interval=0.5),
         "memory_percent": psutil.virtual_memory().percent,
@@ -175,13 +183,11 @@ st.markdown("---")
 # SYSTEM INFO BAR
 # ─────────────────────────────
 col1, col2, col3, col4 = st.columns(4)
-
 info_style = (
     "background:#161b22; border:1px solid #21262d; border-radius:10px;"
     "padding:0.6rem 1rem; font-family:'JetBrains Mono',monospace;"
     "font-size:0.8rem; color:#8b949e;"
 )
-
 col1.markdown(f'<div style="{info_style}">💻 &nbsp;<span style="color:#e6edf3;">{platform.node()}</span></div>', unsafe_allow_html=True)
 col2.markdown(f'<div style="{info_style}">🧠 &nbsp;<span style="color:#e6edf3;">{round(psutil.virtual_memory().total/(1024**3),1)} GB RAM</span></div>', unsafe_allow_html=True)
 col3.markdown(f'<div style="{info_style}">⚙️ &nbsp;<span style="color:#e6edf3;">{psutil.cpu_count(logical=False)} CPU Cores</span></div>', unsafe_allow_html=True)
@@ -202,20 +208,14 @@ health_score = 100 - (
 health_score = round(health_score, 1)
 
 def get_color(value, thresholds=(60, 80)):
-    if value < thresholds[0]:
-        return "#3fb950"
-    elif value < thresholds[1]:
-        return "#e3b341"
-    else:
-        return "#f85149"
+    if value < thresholds[0]: return "#3fb950"
+    elif value < thresholds[1]: return "#e3b341"
+    else: return "#f85149"
 
 def get_health_color(score):
-    if score >= 70:
-        return "#3fb950"
-    elif score >= 50:
-        return "#e3b341"
-    else:
-        return "#f85149"
+    if score >= 70: return "#3fb950"
+    elif score >= 50: return "#e3b341"
+    else: return "#f85149"
 
 cpu_color    = get_color(data['cpu_percent'])
 mem_color    = get_color(data['memory_percent'])
@@ -249,7 +249,7 @@ metric_card(m4, "Health Score", health_score,           "",  health_color, "❤�
 st.markdown("<div style='margin:1.5rem 0;'></div>", unsafe_allow_html=True)
 
 # ─────────────────────────────
-# FETCH DATA (with simulation fallback)
+# FETCH DATA
 # ─────────────────────────────
 rows = []
 using_simulated = False
@@ -257,11 +257,9 @@ using_simulated = False
 if DB_AVAILABLE:
     try:
         rows = db.fetch_recent_metrics(30)
-    except Exception as e:
-        st.warning(f"⚠️ DB fetch failed: {e}. Showing simulated data.")
+    except Exception:
         rows = []
 
-# If DB returned nothing (empty table or DB unavailable), simulate
 if not rows:
     rows = generate_simulated_rows(30)
     using_simulated = True
@@ -271,7 +269,6 @@ if not rows:
 # ─────────────────────────────
 df = pd.DataFrame(rows)
 
-# Parse timestamps safely
 if "collected_at" in df.columns:
     df["collected_at"] = pd.to_datetime(df["collected_at"], errors="coerce")
     df = df.dropna(subset=["collected_at"])
@@ -279,7 +276,6 @@ if "collected_at" in df.columns:
 else:
     df["collected_at"] = pd.Series(dtype="datetime64[ns]")
 
-# Ensure numeric columns exist and are valid
 for col_name in ["cpu_percent", "memory_percent", "disk_percent"]:
     if col_name not in df.columns:
         df[col_name] = 0
@@ -299,16 +295,16 @@ g1, g2, g3 = st.columns(3)
 graph_cols = [g1, g2, g3]
 
 plt.rcParams.update({
-    "figure.facecolor":  "#161b22",
-    "axes.facecolor":    "#0d1117",
-    "axes.edgecolor":    "#30363d",
-    "axes.labelcolor":   "#8b949e",
-    "xtick.color":       "#8b949e",
-    "ytick.color":       "#8b949e",
-    "grid.color":        "#21262d",
-    "text.color":        "#e6edf3",
-    "font.family":       "monospace",
-    "font.size":         8,
+    "figure.facecolor": "#161b22",
+    "axes.facecolor":   "#0d1117",
+    "axes.edgecolor":   "#30363d",
+    "axes.labelcolor":  "#8b949e",
+    "xtick.color":      "#8b949e",
+    "ytick.color":      "#8b949e",
+    "grid.color":       "#21262d",
+    "text.color":       "#e6edf3",
+    "font.family":      "monospace",
+    "font.size":        8,
 })
 
 for gcol, (col_key, label, color) in zip(graph_cols, graph_configs):
@@ -316,20 +312,15 @@ for gcol, (col_key, label, color) in zip(graph_cols, graph_configs):
         st.markdown(f"""
         <div style="font-family:'JetBrains Mono',monospace; font-size:0.72rem;
                     color:#8b949e; text-transform:uppercase; letter-spacing:0.1em;
-                    margin-bottom:6px;">
-            {label}
-        </div>
+                    margin-bottom:6px;">{label}</div>
         """, unsafe_allow_html=True)
 
         fig, ax = plt.subplots(figsize=(4, 2.2))
 
         if not df.empty and len(df) > 1:
-            ax.fill_between(df["collected_at"], df[col_key],
-                            alpha=0.15, color=color)
-            ax.plot(df["collected_at"], df[col_key],
-                    color=color, linewidth=1.5, zorder=3)
-            ax.scatter(df["collected_at"].iloc[-1], df[col_key].iloc[-1],
-                       color=color, s=40, zorder=4)
+            ax.fill_between(df["collected_at"], df[col_key], alpha=0.15, color=color)
+            ax.plot(df["collected_at"], df[col_key], color=color, linewidth=1.5, zorder=3)
+            ax.scatter(df["collected_at"].iloc[-1], df[col_key].iloc[-1], color=color, s=40, zorder=4)
             ax.xaxis.set_major_formatter(mdates.DateFormatter("%H:%M"))
             ax.xaxis.set_major_locator(mdates.AutoDateLocator())
             plt.setp(ax.xaxis.get_majorticklabels(), rotation=30, ha='right')
@@ -342,7 +333,6 @@ for gcol, (col_key, label, color) in zip(graph_cols, graph_configs):
         ax.spines['top'].set_visible(False)
         ax.spines['right'].set_visible(False)
         fig.tight_layout()
-
         st.pyplot(fig)
         plt.close(fig)
 
@@ -361,7 +351,6 @@ if DB_AVAILABLE:
     except Exception:
         alert_df = pd.DataFrame()
 
-# Safe column access for alerts
 if not alert_df.empty and "severity" in alert_df.columns:
     critical = int((alert_df["severity"] == "CRITICAL").sum())
     warning  = int((alert_df["severity"] == "WARNING").sum())
@@ -370,14 +359,11 @@ else:
     warning  = 0
 
 if health_score >= 70:
-    hs_label = "NORMAL"
-    hs_color = "#3fb950"
+    hs_label, hs_color = "NORMAL", "#3fb950"
 elif health_score >= 50:
-    hs_label = "WARNING"
-    hs_color = "#e3b341"
+    hs_label, hs_color = "WARNING", "#e3b341"
 else:
-    hs_label = "CRITICAL"
-    hs_color = "#f85149"
+    hs_label, hs_color = "CRITICAL", "#f85149"
 
 c1, c2, c3 = st.columns(3)
 
@@ -387,13 +373,9 @@ def status_card(col, icon, label, value, color, sub=""):
                 padding:1.2rem 1.4rem; text-align:center; border-top:3px solid {color};">
         <div style="font-size:1.8rem; margin-bottom:4px;">{icon}</div>
         <div style="font-family:'JetBrains Mono',monospace; font-size:0.7rem;
-                    color:#8b949e; text-transform:uppercase; letter-spacing:0.1em;">
-            {label}
-        </div>
+                    color:#8b949e; text-transform:uppercase; letter-spacing:0.1em;">{label}</div>
         <div style="font-family:'JetBrains Mono',monospace; font-size:1.8rem;
-                    font-weight:700; color:{color}; margin:4px 0;">
-            {value}
-        </div>
+                    font-weight:700; color:{color}; margin:4px 0;">{value}</div>
         {f'<div style="font-size:0.75rem; color:#8b949e;">{sub}</div>' if sub else ''}
     </div>
     """, unsafe_allow_html=True)
@@ -410,22 +392,13 @@ st.markdown("<div style='margin:1.5rem 0;'></div>", unsafe_allow_html=True)
 st.markdown("### 🗃️ Last 30 Minutes — Raw Data")
 
 table_df = df.copy()
-
-# Safe datetime parsing for table
 if "collected_at" in table_df.columns:
     table_df["collected_at"] = pd.to_datetime(table_df["collected_at"], errors="coerce")
-
-# Only round numeric columns
 numeric_cols = table_df.select_dtypes(include="number").columns
 if len(numeric_cols) > 0:
     table_df[numeric_cols] = table_df[numeric_cols].round(2)
 
-st.dataframe(
-    table_df,
-    use_container_width=True,
-    height=400,
-    hide_index=True,
-)
+st.dataframe(table_df, use_container_width=True, height=400, hide_index=True)
 
 st.markdown("<div style='margin:1.5rem 0;'></div>", unsafe_allow_html=True)
 
@@ -436,20 +409,17 @@ st.markdown("### 📋 Recent Alerts")
 
 if not alert_df.empty:
     required_cols = {"severity", "component", "message"}
-
     if required_cols.issubset(alert_df.columns):
         for a in alert_df.head(5).to_dict("records"):
             severity  = str(a.get("severity", "INFO"))
             component = str(a.get("component", "unknown"))
             message   = str(a.get("message", ""))
-
             if severity == "CRITICAL":
                 icon, color = "🔴", "#f85149"
             elif severity == "WARNING":
                 icon, color = "🟡", "#e3b341"
             else:
                 icon, color = "🔵", "#58a6ff"
-
             st.markdown(f"""
             <div style="background:#161b22; border:1px solid #21262d; border-left:4px solid {color};
                         border-radius:10px; padding:0.8rem 1.2rem; margin-bottom:0.5rem;
@@ -461,7 +431,7 @@ if not alert_df.empty:
             """, unsafe_allow_html=True)
     else:
         missing = required_cols - set(alert_df.columns)
-        st.warning(f"⚠️ Alert table missing columns: {missing}. Showing raw data.")
+        st.warning(f"⚠️ Alert table missing columns: {missing}")
         st.dataframe(alert_df.head(5), use_container_width=True, hide_index=True)
 else:
     st.markdown("""
@@ -486,6 +456,6 @@ with fcol2:
     st.markdown("""
     <div style="padding-top:10px; font-family:'JetBrains Mono',monospace;
                 font-size:0.72rem; color:#30363d;">
-        SentinelOps · Built with Python, PostgreSQL &amp; Streamlit · Auto-refreshes every 10s
+        SentinelOps · Built with Python, PostgreSQL &amp; Streamlit
     </div>
     """, unsafe_allow_html=True)
