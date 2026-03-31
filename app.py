@@ -49,7 +49,7 @@ if not st.session_state.logged_in:
     @keyframes drift{to{background-position:44px 44px;}}
     .login-glow{position:fixed;width:500px;height:500px;border-radius:50%;background:rgba(88,166,255,0.05);filter:blur(100px);top:50%;left:50%;transform:translate(-50%,-50%);animation:gp 5s ease-in-out infinite alternate;z-index:0;}
     @keyframes gp{to{transform:translate(-50%,-50%) scale(1.2);}}
-    .login-card{position:relative;z-index:2;width:100%;max-width:340px;margin:0 auto;animation:up 0.7s cubic-bezier(0.16,1,0.3,1) both;}
+    .login-card{position:relative;z-index:2;width:100%;max-width:340px;margin:0 auto;background:rgba(22,27,34,0.8);border:1px solid #30363d;border-radius:16px;padding:2.5rem 2rem;backdrop-filter:blur(10px);animation:up 0.7s cubic-bezier(0.16,1,0.3,1) both;}
     @keyframes up{from{opacity:0;transform:translateY(24px);}to{opacity:1;transform:translateY(0);}}
     .logo-wrap{display:flex;flex-direction:column;align-items:center;margin-bottom:2rem;}
     .logo-ring{width:60px;height:60px;border-radius:50%;border:1px solid rgba(88,166,255,0.3);background:rgba(88,166,255,0.06);display:flex;align-items:center;justify-content:center;font-size:26px;margin:0 auto 1rem;position:relative;animation:spin 0.8s cubic-bezier(0.16,1,0.3,1) 0.2s both;}
@@ -78,7 +78,7 @@ if not st.session_state.logged_in:
     with c2:
         username = st.text_input("Username", placeholder="admin")
         password = st.text_input("Password", type="password", placeholder="••••••••")
-        if st.button("Sign in →", use_container_width=True):
+        if st.button("Login →", use_container_width=True):
             if username == "admin" and password == "sentinel123":
                 st.session_state.logged_in = True
                 st.rerun()
