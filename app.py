@@ -43,48 +43,71 @@ if "logged_in" not in st.session_state:
 if not st.session_state.logged_in:
     st.markdown("""
     <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap');
-    .stApp { background:#0d1117 !important; }
-    .login-bg { position:fixed;inset:0;background-image:linear-gradient(rgba(88,166,255,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(88,166,255,0.04) 1px,transparent 1px);background-size:44px 44px;animation:drift 20s linear infinite;z-index:0; }
-    @keyframes drift{to{background-position:44px 44px;}}
-    .login-glow{position:fixed;width:500px;height:500px;border-radius:50%;background:rgba(88,166,255,0.05);filter:blur(100px);top:50%;left:50%;transform:translate(-50%,-50%);animation:gp 5s ease-in-out infinite alternate;z-index:0;}
-    @keyframes gp{to{transform:translate(-50%,-50%) scale(1.2);}}
-    .login-card{position:relative;z-index:2;width:100%;max-width:340px;margin:0 auto;background:rgba(22,27,34,0.8);border:1px solid #30363d;border-radius:16px;padding:2.5rem 2rem;backdrop-filter:blur(10px);animation:up 0.7s cubic-bezier(0.16,1,0.3,1) both;}
-    @keyframes up{from{opacity:0;transform:translateY(24px);}to{opacity:1;transform:translateY(0);}}
-    .logo-wrap{display:flex;flex-direction:column;align-items:center;margin-bottom:2rem;}
-    .logo-ring{width:60px;height:60px;border-radius:50%;border:1px solid rgba(88,166,255,0.3);background:rgba(88,166,255,0.06);display:flex;align-items:center;justify-content:center;font-size:26px;margin:0 auto 1rem;position:relative;animation:spin 0.8s cubic-bezier(0.16,1,0.3,1) 0.2s both;}
-    @keyframes spin{from{opacity:0;transform:scale(0.5) rotate(-90deg);}to{opacity:1;transform:scale(1) rotate(0);}}
-    .logo-ring::after{content:'';position:absolute;inset:-4px;border-radius:50%;border:1px solid transparent;border-top-color:#58a6ff;animation:rot 3s linear infinite;}
-    @keyframes rot{to{transform:rotate(360deg);}}
-    .app-name{font-size:22px;font-weight:700;color:#e6edf3;letter-spacing:-0.02em;text-align:center;font-family:'Inter',sans-serif;}
-    .app-sub{font-size:11px;color:#8b949e;font-family:'JetBrains Mono',monospace;letter-spacing:0.1em;margin-top:3px;text-align:center;}
-    .login-status{display:flex;align-items:center;justify-content:center;gap:6px;margin-top:1.2rem;}
-    .login-dot{width:6px;height:6px;border-radius:50%;background:#3fb950;display:inline-block;animation:blink 1.5s ease-in-out infinite;}
-    @keyframes blink{0%,100%{opacity:1;}50%{opacity:0.3;}}
-    .login-status span{font-size:11px;color:#484f58;font-family:'JetBrains Mono',monospace;letter-spacing:0.06em;}
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap');
+    .stApp { background:#020818 !important; font-family:'Poppins',sans-serif; }
+    .orb1{position:fixed;width:500px;height:500px;border-radius:50%;background:rgba(6,182,212,0.12);filter:blur(100px);top:-150px;left:-150px;animation:o1 8s ease-in-out infinite alternate;z-index:0;}
+    .orb2{position:fixed;width:400px;height:400px;border-radius:50%;background:rgba(59,130,246,0.1);filter:blur(90px);bottom:-100px;right:-100px;animation:o2 6s ease-in-out infinite alternate;z-index:0;}
+    .orb3{position:fixed;width:250px;height:250px;border-radius:50%;background:rgba(14,165,233,0.08);filter:blur(80px);top:40%;right:20%;animation:o3 7s ease-in-out infinite alternate;z-index:0;}
+    @keyframes o1{to{transform:translate(50px,40px) scale(1.1);}}
+    @keyframes o2{to{transform:translate(-40px,30px) scale(1.1);}}
+    @keyframes o3{to{transform:translateY(-50px) scale(1.2);}}
+    .bg-grid{position:fixed;inset:0;background-image:linear-gradient(rgba(6,182,212,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(59,130,246,0.03) 1px,transparent 1px);background-size:50px 50px;animation:gridDrift 25s linear infinite;z-index:0;}
+    @keyframes gridDrift{to{background-position:50px 50px;}}
+    .scan-line{position:fixed;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(6,182,212,0.5),transparent);animation:scanAnim 6s ease-in-out infinite;z-index:1;}
+    @keyframes scanAnim{0%{top:0;opacity:0;}5%{opacity:1;}95%{opacity:0.8;}100%{top:100%;opacity:0;}}
+    .login-card{position:relative;z-index:10;width:100%;max-width:400px;margin:0 auto;background:rgba(2,15,35,0.85);border:1px solid rgba(6,182,212,0.2);border-radius:24px;padding:2.8rem 2.4rem;backdrop-filter:blur(20px);animation:cardIn 0.8s cubic-bezier(0.16,1,0.3,1) both,borderPulse 4s ease-in-out 1s infinite alternate;}
+    @keyframes cardIn{from{opacity:0;transform:translateY(30px) scale(0.97);}to{opacity:1;transform:translateY(0) scale(1);}}
+    @keyframes borderPulse{from{border-color:rgba(6,182,212,0.15);}to{border-color:rgba(6,182,212,0.5);box-shadow:0 0 40px rgba(6,182,212,0.08);}}
+    .logo-ring{width:68px;height:68px;border-radius:50%;border:1px solid rgba(6,182,212,0.35);background:linear-gradient(135deg,rgba(6,182,212,0.15),rgba(59,130,246,0.1));display:flex;align-items:center;justify-content:center;font-size:28px;margin:0 auto 1rem;position:relative;animation:logoSpin 0.9s cubic-bezier(0.16,1,0.3,1) 0.3s both;}
+    @keyframes logoSpin{from{opacity:0;transform:scale(0.4) rotate(-180deg);}to{opacity:1;transform:scale(1) rotate(0);}}
+    .logo-ring::before{content:\'\';position:absolute;inset:-5px;border-radius:50%;border:1.5px solid transparent;border-top-color:#06b6d4;border-right-color:#3b82f6;animation:ringRot 3s linear infinite;}
+    .logo-ring::after{content:\'\';position:absolute;inset:-10px;border-radius:50%;border:1px solid transparent;border-bottom-color:rgba(6,182,212,0.3);animation:ringRot 5s linear infinite reverse;}
+    @keyframes ringRot{to{transform:rotate(360deg);}}
+    .app-title{font-size:24px;font-weight:700;background:linear-gradient(90deg,#38bdf8,#06b6d4,#60a5fa);-webkit-background-clip:text;-webkit-text-fill-color:transparent;letter-spacing:-0.02em;text-align:center;margin-bottom:4px;}
+    .app-sub2{font-size:11px;color:#164e63;font-family:\'JetBrains Mono\',monospace;letter-spacing:0.12em;text-align:center;overflow:hidden;white-space:nowrap;border-right:2px solid #06b6d4;width:0;margin:0 auto 1.5rem;animation:typeIt 2.5s steps(24) 1s forwards,cursorBlink 0.8s step-end infinite;}
+    @keyframes typeIt{to{width:200px;}}
+    @keyframes cursorBlink{50%{border-color:transparent;}}
+    .welcome-txt h3{font-size:18px;font-weight:600;color:#e0f2fe;text-align:center;margin-bottom:4px;}
+    .welcome-txt p{font-size:12px;color:#0e7490;text-align:center;margin-bottom:1.5rem;}
+    .status-bar2{display:flex;align-items:center;justify-content:center;gap:8px;margin-top:1.2rem;}
+    .status-dot2{width:6px;height:6px;border-radius:50%;background:#06b6d4;display:inline-block;animation:blink2 1.5s ease-in-out infinite;}
+    @keyframes blink2{0%,100%{opacity:1;}50%{opacity:0.2;}}
+    .status-bar2 span{font-size:11px;color:#164e63;font-family:\'JetBrains Mono\',monospace;letter-spacing:0.08em;}
     </style>
-    <div class="login-bg"></div>
-    <div class="login-glow"></div>
+    <div class="orb1"></div><div class="orb2"></div><div class="orb3"></div>
+    <div class="bg-grid"></div>
+    <div class="scan-line"></div>
     <div class="login-card">
-        <div class="logo-wrap">
-            <div class="logo-ring">🛡️</div>
-            <div class="app-name">SentinelOps</div>
-            <div class="app-sub">SYSTEM HEALTH ENGINE</div>
+        <div class="logo-ring">🛡️</div>
+        <div class="app-title">SentinelOps</div>
+        <div class="app-sub2">SYSTEM HEALTH ENGINE</div>
+        <div class="welcome-txt">
+            <h3>Welcome back</h3>
+            <p>Sign in to your dashboard</p>
         </div>
     </div>
     """, unsafe_allow_html=True)
 
     c1, c2, c3 = st.columns([1.2, 1, 1.2])
     with c2:
-        username = st.text_input("Username", placeholder="admin")
-        password = st.text_input("Password", type="password", placeholder="••••••••")
+        username = st.text_input("👤  Username", placeholder="admin")
+        password = st.text_input("🔒  Password", type="password", placeholder="••••••••")
+        remember = st.checkbox("Remember me")
         if st.button("Login →", use_container_width=True):
-            if username == "admin" and password == "sentinel123":
+            if not username:
+                st.error("⚠ Please enter your username")
+            elif not password:
+                st.error("⚠ Please enter your password")
+            elif username == "admin" and password == "sentinel123":
                 st.session_state.logged_in = True
                 st.rerun()
             else:
-                st.error("❌ Invalid credentials")
-        st.markdown('''<div class="login-status"><div class="login-dot"></div><span>ALL SYSTEMS OPERATIONAL</span></div>''', unsafe_allow_html=True)
+                st.error("❌ Invalid username or password")
+        st.markdown('''
+        <div class="status-bar2">
+            <div class="status-dot2"></div>
+            <span>ALL SYSTEMS OPERATIONAL</span>
+        </div>''', unsafe_allow_html=True)
     st.stop()
 
 # Sirf ek baar thread start ho
@@ -228,7 +251,10 @@ with col_status:
         'font-size:0.7rem; font-family:\'JetBrains Mono\',monospace; font-weight:600; '
         'letter-spacing:0.05em; background:#2d1a1a; color:#e3b341; border:1px solid #e3b341;">⚡ SIMULATED</span>'
     )
-    st.markdown(f'<div style="text-align:right; padding-top:8px;">{db_badge}</div>', unsafe_allow_html=True)
+    st.markdown(f'<div style="text-align:right; padding-top:8px; margin-bottom:6px;">{db_badge}</div>', unsafe_allow_html=True)
+    if st.button("🚪 Logout", use_container_width=True):
+        st.session_state.logged_in = False
+        st.rerun()
 
 st.markdown("---")
 
