@@ -41,24 +41,50 @@ if "logged_in" not in st.session_state:
     st.session_state.logged_in = False
 
 if not st.session_state.logged_in:
-    st.markdown("<br><br><br>", unsafe_allow_html=True)
-    col1, col2, col3 = st.columns([1.5, 1, 1.5])
-    with col2:
-        st.markdown("""
-        <div style='text-align:center; margin-bottom:1.5rem;'>
-            <span style='font-size:3rem;'>🛡️</span>
-            <h2 style='color:#e6edf3; font-family:Inter,sans-serif; margin:0.5rem 0 0.2rem;'>SentinelOps</h2>
-            <p style='color:#8b949e; font-size:0.8rem; margin:0;'>Enter credentials to continue</p>
+    st.markdown("""
+    <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap');
+    .stApp { background:#0d1117 !important; }
+    .login-bg { position:fixed;inset:0;background-image:linear-gradient(rgba(88,166,255,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(88,166,255,0.04) 1px,transparent 1px);background-size:44px 44px;animation:drift 20s linear infinite;z-index:0; }
+    @keyframes drift{to{background-position:44px 44px;}}
+    .login-glow{position:fixed;width:500px;height:500px;border-radius:50%;background:rgba(88,166,255,0.05);filter:blur(100px);top:50%;left:50%;transform:translate(-50%,-50%);animation:gp 5s ease-in-out infinite alternate;z-index:0;}
+    @keyframes gp{to{transform:translate(-50%,-50%) scale(1.2);}}
+    .login-card{position:relative;z-index:2;width:100%;max-width:340px;margin:0 auto;animation:up 0.7s cubic-bezier(0.16,1,0.3,1) both;}
+    @keyframes up{from{opacity:0;transform:translateY(24px);}to{opacity:1;transform:translateY(0);}}
+    .logo-wrap{display:flex;flex-direction:column;align-items:center;margin-bottom:2rem;}
+    .logo-ring{width:60px;height:60px;border-radius:50%;border:1px solid rgba(88,166,255,0.3);background:rgba(88,166,255,0.06);display:flex;align-items:center;justify-content:center;font-size:26px;margin:0 auto 1rem;position:relative;animation:spin 0.8s cubic-bezier(0.16,1,0.3,1) 0.2s both;}
+    @keyframes spin{from{opacity:0;transform:scale(0.5) rotate(-90deg);}to{opacity:1;transform:scale(1) rotate(0);}}
+    .logo-ring::after{content:'';position:absolute;inset:-4px;border-radius:50%;border:1px solid transparent;border-top-color:#58a6ff;animation:rot 3s linear infinite;}
+    @keyframes rot{to{transform:rotate(360deg);}}
+    .app-name{font-size:22px;font-weight:700;color:#e6edf3;letter-spacing:-0.02em;text-align:center;font-family:'Inter',sans-serif;}
+    .app-sub{font-size:11px;color:#8b949e;font-family:'JetBrains Mono',monospace;letter-spacing:0.1em;margin-top:3px;text-align:center;}
+    .login-status{display:flex;align-items:center;justify-content:center;gap:6px;margin-top:1.2rem;}
+    .login-dot{width:6px;height:6px;border-radius:50%;background:#3fb950;display:inline-block;animation:blink 1.5s ease-in-out infinite;}
+    @keyframes blink{0%,100%{opacity:1;}50%{opacity:0.3;}}
+    .login-status span{font-size:11px;color:#484f58;font-family:'JetBrains Mono',monospace;letter-spacing:0.06em;}
+    </style>
+    <div class="login-bg"></div>
+    <div class="login-glow"></div>
+    <div class="login-card">
+        <div class="logo-wrap">
+            <div class="logo-ring">🛡️</div>
+            <div class="app-name">SentinelOps</div>
+            <div class="app-sub">SYSTEM HEALTH ENGINE</div>
         </div>
-        """, unsafe_allow_html=True)
+    </div>
+    """, unsafe_allow_html=True)
+
+    c1, c2, c3 = st.columns([1.2, 1, 1.2])
+    with c2:
         username = st.text_input("Username", placeholder="admin")
         password = st.text_input("Password", type="password", placeholder="••••••••")
-        if st.button("🔐  Login", use_container_width=True):
+        if st.button("Sign in →", use_container_width=True):
             if username == "admin" and password == "sentinel123":
                 st.session_state.logged_in = True
                 st.rerun()
             else:
-                st.error("❌ Invalid username or password")
+                st.error("❌ Invalid credentials")
+        st.markdown('''<div class="login-status"><div class="login-dot"></div><span>ALL SYSTEMS OPERATIONAL</span></div>''', unsafe_allow_html=True)
     st.stop()
 
 # Sirf ek baar thread start ho
