@@ -12,12 +12,9 @@ import time
 import json
 import os
 import logging
-import smtplib
 import hashlib
 import csv
 from io import StringIO, BytesIO
-from email.mime.text import MIMEText
-from email.mime.multipart import MIMEMultipart
 
 try:
     from reportlab.lib.pagesizes import A4
@@ -74,15 +71,6 @@ def record_alert(severity, component, message):
     if len(st.session_state.alert_history) > 200:
         st.session_state.alert_history = st.session_state.alert_history[:200]
 
-DEFAULT_SYSTEMS = [
-    {"id": "local", "name": "localhost", "host": "127.0.0.1", "port": 22, "status": "online", "tags": ["primary", "prod"]},
-]
-
-def get_systems():
-    if "registered_systems" not in st.session_state:
-        st.session_state.registered_systems = DEFAULT_SYSTEMS.copy()
-    return st.session_state.registered_systems
-
 ADMIN_CONFIG_FILE = "admin_config.json"
 
 def load_admin_config():
@@ -92,10 +80,8 @@ def load_admin_config():
             "viewer": {"password_hash": hashlib.sha256("view123".encode()).hexdigest(), "role": "viewer"},
         },
         "alert_thresholds": {"cpu": 80, "memory": 85, "disk": 90, "cpu_temp": 80},
-        "email_config": {"enabled": False, "smtp_server": "", "smtp_port": 587, "sender": "", "password": "", "recipients": []},
         "auto_refresh_interval": 30,
         "retention_days": 7,
-        "voice_alerts": True,
     }
     if os.path.exists(ADMIN_CONFIG_FILE):
         try:
@@ -183,25 +169,6 @@ def analyze_root_cause(cpu, memory, disk, history_df=None):
         causes.append(("✅ All Systems Normal", "No anomalies detected"))
         recommendations.append("System is healthy — continue monitoring")
     return {"severity": severity, "causes": causes, "recommendations": recommendations}
-
-def send_email_alert(subject, body, config):
-    if not config.get("enabled"):
-        return False, "Email alerts disabled"
-    try:
-        msg = MIMEMultipart()
-        msg["From"] = config["sender"]
-        msg["To"] = ", ".join(config["recipients"])
-        msg["Subject"] = f"[SentinelOps] {subject}"
-        msg.attach(MIMEText(body, "html"))
-        with smtplib.SMTP(config["smtp_server"], config["smtp_port"]) as server:
-            server.starttls()
-            server.login(config["sender"], config["password"])
-            server.send_message(msg)
-        log_event("INFO", "EmailAlert", f"Alert sent: {subject}")
-        return True, "Sent"
-    except Exception as e:
-        log_event("ERROR", "EmailAlert", str(e))
-        return False, str(e)
 
 def get_ai_response(question, metrics_context):
     q = question.lower()
@@ -323,32 +290,6 @@ def generate_pdf_report(cpu, memory, disk, health_score, health_color_name, aler
     buffer.seek(0)
     return buffer.read()
 
-def inject_voice_alert(message, severity="WARNING"):
-    if not admin_config.get("voice_alerts", True):
-        return
-    voice_js = f"""
-    <script>
-    (function() {{
-        if ('speechSynthesis' in window) {{
-            window.speechSynthesis.cancel();
-            const msg = new SpeechSynthesisUtterance("{message}");
-            msg.rate = 0.9;
-            msg.pitch = {'0.8' if severity == 'CRITICAL' else '1.0'};
-            msg.volume = 1;
-            function speak() {{
-                const voices = window.speechSynthesis.getVoices();
-                const eng = voices.find(v => v.lang.startsWith('en'));
-                if (eng) msg.voice = eng;
-                window.speechSynthesis.speak(msg);
-            }}
-            if (window.speechSynthesis.getVoices().length > 0) {{ speak(); }}
-            else {{ window.speechSynthesis.addEventListener('voiceschanged', speak, {{ once: true }}); }}
-        }}
-    }})();
-    </script>
-    """
-    st.components.v1.html(voice_js, height=0)
-
 def generate_simulated_rows(n=30):
     now = datetime.datetime.now()
     rows = []
@@ -395,12 +336,10 @@ if "user_role" not in st.session_state:
     st.session_state.user_role = None
 
 # ══════════════════════════════════════════════════════════
-#  LOGIN PAGE  ——  ONLY USER LOGIN ON FRONT PAGE
-#  Admin can click "Admin Login" link to get their own page
+#  LOGIN PAGE
 # ══════════════════════════════════════════════════════════
 if not st.session_state.logged_in:
 
-    # ── Shared background styles ──
     st.markdown("""
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap');
@@ -431,7 +370,6 @@ if not st.session_state.logged_in:
     .status-dot{width:6px;height:6px;border-radius:50%;background:#06b6d4;display:inline-block;animation:blink2 1.5s ease-in-out infinite;}
     @keyframes blink2{0%,100%{opacity:1;}50%{opacity:0.2;}}
     .status-bar span{font-size:11px;color:#164e63;font-family:'JetBrains Mono',monospace;letter-spacing:0.08em;}
-    .admin-link-bar{text-align:center;margin-top:1.2rem;font-family:'JetBrains Mono',monospace;font-size:11px;color:#164e63;}
     .admin-card{position:relative;z-index:10;width:100%;max-width:420px;margin:0 auto;background:rgba(2,15,35,0.90);border:1px solid rgba(250,204,21,0.25);border-radius:24px;padding:2.8rem 2.4rem;backdrop-filter:blur(20px);animation:cardIn 0.8s cubic-bezier(0.16,1,0.3,1) both,adminPulse 4s ease-in-out 1s infinite alternate;}
     @keyframes adminPulse{from{border-color:rgba(250,204,21,0.15);}to{border-color:rgba(250,204,21,0.5);box-shadow:0 0 40px rgba(250,204,21,0.06);}}
     </style>
@@ -440,11 +378,9 @@ if not st.session_state.logged_in:
     <div class="scan-line"></div>
     """, unsafe_allow_html=True)
 
-    # Use session state to switch between user login and admin login views
     if "show_admin_login" not in st.session_state:
         st.session_state.show_admin_login = False
 
-    # ── USER LOGIN (default front page) ──
     if not st.session_state.show_admin_login:
         st.markdown("""
         <div class="login-card">
@@ -494,12 +430,10 @@ if not st.session_state.logged_in:
 
             st.markdown("<div style='height:8px;'></div>", unsafe_allow_html=True)
 
-            # Admin login link button
             if st.button("👑  Admin Login", use_container_width=True, key="goto_admin"):
                 st.session_state.show_admin_login = True
                 st.rerun()
 
-    # ── ADMIN LOGIN PAGE ──
     else:
         st.markdown("""
         <div class="admin-card">
@@ -605,7 +539,7 @@ health_color = get_health_color(health_score)
 temp_color   = get_temp_color(cpu_temp, temp_threshold)
 
 # ─────────────────────────────
-# AUTO ALERT CHECK
+# AUTO ALERT CHECK (no voice)
 # ─────────────────────────────
 thresholds = admin_config.get("alert_thresholds", {"cpu": 80, "memory": 85, "disk": 90, "cpu_temp": 80})
 if "last_alert_time" not in st.session_state:
@@ -665,12 +599,6 @@ if alerts_triggered:
         color = "#f85149" if sev == "CRITICAL" else "#e3b341"
         icon = "🚨" if sev == "CRITICAL" else "⚠️"
         st.markdown(f'<div style="background:rgba(248,81,73,0.08);border:1px solid {color};border-left:4px solid {color};border-radius:10px;padding:0.7rem 1.2rem;margin-bottom:8px;font-family:\'JetBrains Mono\',monospace;font-size:0.82rem;color:{color};animation:alertPulse 2s ease-in-out infinite;">{icon} <strong>[{sev}]</strong> {comp}: {msg}</div>', unsafe_allow_html=True)
-    if admin_config.get("voice_alerts") and alerts_triggered:
-        temp_alert = next((a for a in alerts_triggered if "Temperature" in a[1]), None)
-        if temp_alert: inject_voice_alert("Warning! Your CPU temperature is high.", temp_alert[0])
-        else:
-            top = alerts_triggered[0]
-            inject_voice_alert(f"Alert: {top[1]}. {top[2]}", top[0])
 
 if cpu_temp > temp_threshold:
     st.markdown(f'<div style="background:rgba(248,81,73,0.12);border:1px solid #f85149;border-left:4px solid #f85149;border-radius:10px;padding:0.7rem 1.2rem;margin-bottom:8px;font-family:\'JetBrains Mono\',monospace;font-size:0.82rem;color:#f85149;animation:alertPulse 1.5s ease-in-out infinite;">🌡️ <strong>[THERMAL ALERT]</strong> CPU Temperature: <strong>{cpu_temp}°C</strong> — Exceeds threshold of {temp_threshold}°C!</div>', unsafe_allow_html=True)
@@ -688,14 +616,13 @@ st.markdown("<div style='margin:1.2rem 0;'></div>", unsafe_allow_html=True)
 
 # ══════════════════════════════════════════════════════════
 #  ROLE-BASED TABS
-#  Admin gets all tabs including Admin Panel — NO re-auth gate
 # ══════════════════════════════════════════════════════════
 is_admin = st.session_state.user_role == "admin"
 
 if is_admin:
-    tab_dashboard, tab_rca, tab_ai, tab_report, tab_logs, tab_multisys, tab_admin = st.tabs([
+    tab_dashboard, tab_rca, tab_ai, tab_report, tab_logs, tab_admin = st.tabs([
         "📊  Dashboard", "🔍  Root Cause", "🤖  AI Assistant", "📄  PDF Report",
-        "🗒️  Logs", "🌐  Multi-System", "👑  Admin Panel",
+        "🗒️  Logs", "👑  Admin Panel",
     ])
 else:
     tab_dashboard, tab_rca, tab_ai, tab_report = st.tabs([
@@ -924,7 +851,7 @@ if is_admin:
         st.markdown("### 🗒️ System Logs")
         log_col1, log_col2, log_col3 = st.columns([2, 1, 1])
         with log_col1: log_filter = st.selectbox("Filter by Level", ["ALL","INFO","WARNING","ERROR","CRITICAL"])
-        with log_col2: log_component = st.selectbox("Component", ["ALL","Auth","CPU","Memory","Disk","CPUTemp","EmailAlert","RCA","AI","Report","MultiSys","Admin","System","Metrics"])
+        with log_col2: log_component = st.selectbox("Component", ["ALL","Auth","CPU","Memory","Disk","CPUTemp","RCA","AI","Report","Admin","System","Metrics"])
         with log_col3:
             st.markdown("<div style='height:28px;'></div>", unsafe_allow_html=True)
             if st.button("🔄 Refresh Logs", use_container_width=True): st.rerun()
@@ -1003,63 +930,16 @@ if is_admin:
             st.text_area("Last 50 lines", "".join(file_lines), height=200)
 
 # ══════════════════════════════════════════════════════════
-#  TAB 6: MULTI-SYSTEM (ADMIN ONLY)
-# ══════════════════════════════════════════════════════════
-if is_admin:
-    with tab_multisys:
-        st.markdown("### 🌐 Multi-System Monitor")
-        systems = get_systems()
-        st.markdown("#### 🖥️ Registered Systems")
-        cols_per_row = 3
-        for i in range(0, len(systems), cols_per_row):
-            row_systems = systems[i:i+cols_per_row]
-            cols = st.columns(cols_per_row)
-            for col, sys in zip(cols, row_systems):
-                is_local = sys["id"] == "local"
-                if is_local:
-                    s_cpu=data['cpu_percent']; s_mem=data['memory_percent']; s_disk=data['disk_percent']; s_health=health_score; s_color=health_color
-                else:
-                    s_cpu=random.uniform(10,95); s_mem=random.uniform(20,90); s_disk=random.uniform(15,80)
-                    s_health=round(100-(s_cpu*0.4+s_mem*0.35+s_disk*0.25),1); s_color=get_health_color(s_health)
-                status_dot = "🟢" if sys["status"]=="online" else "🔴"
-                tags_html = "".join([f'<span style="background:#21262d;padding:1px 6px;border-radius:4px;font-size:0.65rem;color:#58a6ff;margin-right:3px;">{t}</span>' for t in sys.get("tags",[])])
-                col.markdown(f'<div style="background:#161b22;border:1px solid #21262d;border-top:3px solid {s_color};border-radius:12px;padding:1rem 1.2rem;margin-bottom:0.5rem;"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;"><span style="font-family:\'JetBrains Mono\',monospace;font-weight:700;color:#e6edf3;font-size:0.9rem;">{status_dot} {sys["name"]}</span><span style="font-family:\'JetBrains Mono\',monospace;font-size:0.7rem;color:#8b949e;">{sys["host"]}</span></div><div style="margin-bottom:8px;">{tags_html}</div><div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;"><div style="text-align:center;"><div style="font-family:\'JetBrains Mono\',monospace;font-size:0.68rem;color:#8b949e;">CPU</div><div style="font-family:\'JetBrains Mono\',monospace;font-size:0.9rem;font-weight:700;color:{get_color(s_cpu)};">{s_cpu:.0f}%</div></div><div style="text-align:center;"><div style="font-family:\'JetBrains Mono\',monospace;font-size:0.68rem;color:#8b949e;">MEM</div><div style="font-family:\'JetBrains Mono\',monospace;font-size:0.9rem;font-weight:700;color:{get_color(s_mem)};">{s_mem:.0f}%</div></div><div style="text-align:center;"><div style="font-family:\'JetBrains Mono\',monospace;font-size:0.68rem;color:#8b949e;">DISK</div><div style="font-family:\'JetBrains Mono\',monospace;font-size:0.9rem;font-weight:700;color:{get_color(s_disk)};">{s_disk:.0f}%</div></div></div><div style="margin-top:8px;text-align:center;"><span style="font-family:\'JetBrains Mono\',monospace;font-size:0.7rem;color:{s_color};">❤️ Health: {s_health}</span></div></div>', unsafe_allow_html=True)
-
-        st.markdown("---")
-        st.markdown("#### ➕ Register New System")
-        na,nb,nc,nd = st.columns([2,2,1,1])
-        new_name = na.text_input("Hostname / Label", placeholder="web-server-01")
-        new_host = nb.text_input("IP / Host", placeholder="192.168.1.10")
-        new_port = nc.number_input("SSH Port", value=22, min_value=1, max_value=65535)
-        new_tags = nd.text_input("Tags (comma-sep)", placeholder="prod, web")
-        if st.button("➕ Add System"):
-            if new_name and new_host:
-                new_sys = {"id":f"sys_{len(systems)+1}","name":new_name,"host":new_host,"port":new_port,"status":"online","tags":[t.strip() for t in new_tags.split(",") if t.strip()]}
-                st.session_state.registered_systems = systems + [new_sys]
-                st.success(f"✅ '{new_name}' registered!")
-                st.rerun()
-            else: st.error("⚠️ Name and Host required.")
-        if len(systems) > 1:
-            st.markdown("#### 🗑️ Remove System")
-            removable = [s["name"] for s in systems if s["id"]!="local"]
-            if removable:
-                to_remove = st.selectbox("Select system to remove", removable)
-                if st.button("🗑️ Remove"):
-                    st.session_state.registered_systems = [s for s in systems if s["name"]!=to_remove]
-                    st.success(f"Removed '{to_remove}'")
-                    st.rerun()
-
-# ══════════════════════════════════════════════════════════
-#  TAB 7: ADMIN PANEL — NO RE-AUTH GATE, OPENS DIRECTLY
+#  TAB 6: ADMIN PANEL (ADMIN ONLY)
 # ══════════════════════════════════════════════════════════
 if is_admin:
     with tab_admin:
         st.markdown("### 👑 Admin Panel")
 
         admin_tabs = st.tabs([
-            "⚙️ Thresholds", "📧 Email Alerts", "🔊 Voice Alerts",
-            "👤 User Management", "🔧 System Config",
-            "📊 System Overview", "🚨 Alert Monitor", "🛠️ Control Panel",
+            "⚙️ Thresholds", "👤 User Management",
+            "🔧 System Config", "📊 System Overview",
+            "🚨 Alert Monitor", "🛠️ Control Panel",
         ])
 
         # ── Thresholds ──
@@ -1075,48 +955,8 @@ if is_admin:
                 log_event("INFO","Admin",f"Thresholds updated: CPU={t_cpu}%, MEM={t_mem}%, DISK={t_disk}%, TEMP={t_temp}°C")
                 st.success("✅ Thresholds saved!")
 
-        # ── Email ──
-        with admin_tabs[1]:
-            st.markdown("#### 📧 Email Alert Configuration")
-            ec = admin_config.get("email_config", {})
-            email_enabled = st.checkbox("Enable Email Alerts", value=ec.get("enabled",False))
-            smtp_server  = st.text_input("SMTP Server", value=ec.get("smtp_server",""), placeholder="smtp.gmail.com")
-            smtp_port    = st.number_input("SMTP Port", value=ec.get("smtp_port",587), min_value=1, max_value=65535)
-            sender_email = st.text_input("Sender Email", value=ec.get("sender",""))
-            sender_pass  = st.text_input("Sender Password", type="password", value=ec.get("password",""))
-            recipients_raw = st.text_area("Recipients (one per line)", value="\n".join(ec.get("recipients",[])))
-            col_save, col_test = st.columns(2)
-            with col_save:
-                if st.button("💾 Save Email Config", use_container_width=True):
-                    admin_config["email_config"] = {"enabled":email_enabled,"smtp_server":smtp_server,"smtp_port":smtp_port,"sender":sender_email,"password":sender_pass,"recipients":[r.strip() for r in recipients_raw.split("\n") if r.strip()]}
-                    save_admin_config(admin_config)
-                    st.success("✅ Email config saved!")
-            with col_test:
-                if st.button("📤 Send Test Email", use_container_width=True):
-                    ok, msg = send_email_alert("Test Alert","<h2>SentinelOps Test</h2><p>Email alerts working.</p>",admin_config.get("email_config",{}))
-                    if ok: st.success("✅ Test email sent!")
-                    else: st.error(f"❌ Failed: {msg}")
-
-        # ── Voice ──
-        with admin_tabs[2]:
-            st.markdown("#### 🔊 Voice Alert Settings")
-            voice_enabled = st.checkbox("Enable Voice Alerts", value=admin_config.get("voice_alerts",True))
-            if st.button("💾 Save Voice Settings"):
-                admin_config["voice_alerts"] = voice_enabled
-                save_admin_config(admin_config)
-                st.success("✅ Saved!")
-            vc1, vc2 = st.columns(2)
-            with vc1:
-                if st.button("🔊 Test General Alert"):
-                    inject_voice_alert("SentinelOps voice alert test. System is healthy.","INFO")
-                    st.info("▶️ Playing test voice alert...")
-            with vc2:
-                if st.button("🌡️ Test Temp Alert"):
-                    inject_voice_alert("Warning! Your CPU temperature is high.","CRITICAL")
-                    st.info("▶️ Playing CPU temperature alert...")
-
         # ── User Management ──
-        with admin_tabs[3]:
+        with admin_tabs[1]:
             st.markdown("#### 👤 User Management")
             users = admin_config.get("users", {})
             st.dataframe(pd.DataFrame([{"username":u,"role":v["role"]} for u,v in users.items()]), use_container_width=True, hide_index=True)
@@ -1133,7 +973,7 @@ if is_admin:
                 else: st.error("⚠️ Username and password required.")
 
         # ── System Config ──
-        with admin_tabs[4]:
+        with admin_tabs[2]:
             st.markdown("#### 🔧 System Configuration")
             refresh_int = st.number_input("Auto Refresh Interval (seconds)", value=admin_config.get("auto_refresh_interval",30), min_value=5, max_value=300)
             retention   = st.number_input("Data Retention (days)", value=admin_config.get("retention_days",7), min_value=1, max_value=90)
@@ -1156,7 +996,7 @@ if is_admin:
                     st.success("✅ Chat history cleared.")
 
         # ── System Overview ──
-        with admin_tabs[5]:
+        with admin_tabs[3]:
             st.markdown("#### 📊 System Overview")
             ov1,ov2,ov3,ov4 = st.columns(4)
             hs_label_ov = "HEALTHY" if health_score >= 70 else ("WARNING" if health_score >= 50 else "CRITICAL")
@@ -1164,25 +1004,33 @@ if is_admin:
                 col.markdown(f'<div style="background:#161b22;border:1px solid #21262d;border-top:3px solid {color};border-radius:12px;padding:1.2rem 1.4rem;text-align:center;"><div style="font-size:1.6rem;">{icon}</div><div style="font-family:\'JetBrains Mono\',monospace;font-size:0.68rem;color:#8b949e;text-transform:uppercase;letter-spacing:0.1em;margin:4px 0;">{title}</div><div style="font-family:\'JetBrains Mono\',monospace;font-size:1.6rem;font-weight:700;color:{color};">{value}</div><div style="font-family:\'JetBrains Mono\',monospace;font-size:0.72rem;color:#8b949e;margin-top:4px;">{sub}</div></div>', unsafe_allow_html=True)
             st.markdown("<div style='margin:1rem 0;'></div>", unsafe_allow_html=True)
             st_col1,st_col2,st_col3,st_col4 = st.columns(4)
-            st_col1.metric("Log Entries",       len(st.session_state.get("log_entries",[])))
-            st_col2.metric("Login Events",      len(st.session_state.get("login_history",[])))
-            st_col3.metric("Alerts Fired",      len(st.session_state.get("alert_history",[])))
-            st_col4.metric("Registered Systems",len(get_systems()))
+            st_col1.metric("Log Entries",  len(st.session_state.get("log_entries",[])))
+            st_col2.metric("Login Events", len(st.session_state.get("login_history",[])))
+            st_col3.metric("Alerts Fired", len(st.session_state.get("alert_history",[])))
+            st_col4.metric("Total Users",  len(admin_config.get("users",{})))
             st.markdown("<div style='margin:1rem 0;'></div>", unsafe_allow_html=True)
-            cfg_display = {"CPU Threshold":f"{admin_config['alert_thresholds'].get('cpu',80)}%","Memory Threshold":f"{admin_config['alert_thresholds'].get('memory',85)}%","Disk Threshold":f"{admin_config['alert_thresholds'].get('disk',90)}%","CPU Temp Threshold":f"{admin_config['alert_thresholds'].get('cpu_temp',80)}°C","Voice Alerts":"Enabled" if admin_config.get("voice_alerts") else "Disabled","Email Alerts":"Enabled" if admin_config.get("email_config",{}).get("enabled") else "Disabled","Auto Refresh":f"{admin_config.get('auto_refresh_interval',30)}s","Data Retention":f"{admin_config.get('retention_days',7)} days","Total Users":len(admin_config.get("users",{}))}
+            cfg_display = {
+                "CPU Threshold":      f"{admin_config['alert_thresholds'].get('cpu',80)}%",
+                "Memory Threshold":   f"{admin_config['alert_thresholds'].get('memory',85)}%",
+                "Disk Threshold":     f"{admin_config['alert_thresholds'].get('disk',90)}%",
+                "CPU Temp Threshold": f"{admin_config['alert_thresholds'].get('cpu_temp',80)}°C",
+                "Auto Refresh":       f"{admin_config.get('auto_refresh_interval',30)}s",
+                "Data Retention":     f"{admin_config.get('retention_days',7)} days",
+                "Total Users":        len(admin_config.get("users",{})),
+            }
             st.dataframe(pd.DataFrame(list(cfg_display.items()),columns=["Setting","Value"]), use_container_width=True, hide_index=True)
 
         # ── Alert Monitor ──
-        with admin_tabs[6]:
+        with admin_tabs[4]:
             st.markdown("#### 🚨 Alert Monitor")
             alert_hist = st.session_state.get("alert_history", [])
             if not alert_hist:
                 st.markdown('<div style="background:#161b22;border:1px solid #21262d;border-radius:10px;padding:1.5rem;text-align:center;color:#3fb950;font-family:\'JetBrains Mono\',monospace;">✅ No alerts fired this session — system is healthy!</div>', unsafe_allow_html=True)
             else:
                 am1,am2,am3 = st.columns(3)
-                am1.metric("Total Alerts",  len(alert_hist))
-                am2.metric("Critical",      sum(1 for a in alert_hist if a.get("severity")=="CRITICAL"))
-                am3.metric("Warnings",      sum(1 for a in alert_hist if a.get("severity")=="WARNING"))
+                am1.metric("Total Alerts", len(alert_hist))
+                am2.metric("Critical",     sum(1 for a in alert_hist if a.get("severity")=="CRITICAL"))
+                am3.metric("Warnings",     sum(1 for a in alert_hist if a.get("severity")=="WARNING"))
                 st.markdown("<div style='margin:0.8rem 0;'></div>", unsafe_allow_html=True)
                 for a in alert_hist[:20]:
                     sev = a.get("severity","INFO")
@@ -1195,28 +1043,25 @@ if is_admin:
                 st.rerun()
 
         # ── Control Panel ──
-        with admin_tabs[7]:
+        with admin_tabs[5]:
             st.markdown("#### 🛠️ System Control Panel")
             st.markdown("##### 🔔 Trigger Test Alerts")
             cp1,cp2,cp3 = st.columns(3)
             with cp1:
                 if st.button("⚡ CPU Warning", use_container_width=True):
-                    record_alert("WARNING","CPU",f"TEST: CPU at 82%")
+                    record_alert("WARNING","CPU","TEST: CPU at 82%")
                     log_event("WARNING","CPU","TEST ALERT: CPU warning")
                     st.warning("⚡ CPU Warning injected.")
-                    if admin_config.get("voice_alerts"): inject_voice_alert("Test alert: CPU usage is high.","WARNING")
             with cp2:
                 if st.button("🔥 CPU Critical", use_container_width=True):
                     record_alert("CRITICAL","CPU","TEST: CPU at 95%")
                     log_event("CRITICAL","CPU","TEST ALERT: CPU critical")
                     st.error("🔥 CPU Critical injected.")
-                    if admin_config.get("voice_alerts"): inject_voice_alert("Critical alert! CPU is critically high!","CRITICAL")
             with cp3:
                 if st.button("🌡️ Temp Alert", use_container_width=True):
-                    record_alert("CRITICAL","CPUTemp",f"TEST: CPU Temp at 92°C")
+                    record_alert("CRITICAL","CPUTemp","TEST: CPU Temp at 92°C")
                     log_event("CRITICAL","CPUTemp","TEST ALERT: Temp critical")
                     st.error("🌡️ Temp Alert injected.")
-                    if admin_config.get("voice_alerts"): inject_voice_alert("Warning! CPU temperature is high.","CRITICAL")
             cp4,cp5,cp6 = st.columns(3)
             with cp4:
                 if st.button("🧠 Memory Warning", use_container_width=True):

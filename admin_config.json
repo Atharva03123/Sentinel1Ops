@@ -7,6 +7,10 @@
     "viewer": {
       "password_hash": "656d604dfdba41a262963cce53699bbc56cd7a2c0da1ad5ead45fc49214159d6",
       "role": "viewer"
+    },
+    "operator": {
+      "password_hash": "240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9",
+      "role": "viewer"
     }
   },
   "alert_thresholds": {

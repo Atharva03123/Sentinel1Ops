@@ -172,3 +172,9 @@
 2026-04-07 01:05:18,025 [INFO] [Auth] User 'admin' logged out
 2026-04-07 01:05:31,744 [WARNING] [Auth] Failed login attempt for 'viewer'
 2026-04-07 01:05:44,023 [INFO] [Auth] User 'viewer' logged in (role: viewer)
+2026-04-07 11:57:46,562 [INFO] [Auth] User 'viewer' logged in (role: viewer)
+2026-04-07 11:59:37,460 [INFO] [Auth] User 'viewer' logged out
+2026-04-07 11:59:50,069 [INFO] [Auth] Admin 'admin' logged in
+2026-04-07 12:32:49,106 [INFO] [Auth] User 'admin' logged out
+2026-04-07 12:33:14,170 [INFO] [Auth] User 'viewer' logged in (role: viewer)
+2026-04-07 12:33:19,018 [INFO] [Auth] User 'viewer' logged out
