@@ -1,0 +1,28 @@
+{
+  "users": {
+    "admin": {
+      "password_hash": "3d573b07a34836ad04dba0e92f8dc65ec01eb523e3307be6c707ca3bae03bcb7",
+      "role": "admin"
+    },
+    "viewer": {
+      "password_hash": "656d604dfdba41a262963cce53699bbc56cd7a2c0da1ad5ead45fc49214159d6",
+      "role": "viewer"
+    }
+  },
+  "alert_thresholds": {
+    "cpu": 80,
+    "memory": 85,
+    "disk": 90
+  },
+  "email_config": {
+    "enabled": false,
+    "smtp_server": "",
+    "smtp_port": 587,
+    "sender": "",
+    "password": "",
+    "recipients": []
+  },
+  "auto_refresh_interval": 30,
+  "retention_days": 6,
+  "voice_alerts": true
+}

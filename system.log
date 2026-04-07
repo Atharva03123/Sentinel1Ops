@@ -1,0 +1,62 @@
+2026-04-06 17:01:22,533 - Could not import comtypes.gen, trying to create it.
+2026-04-06 17:01:22,534 - Created comtypes.gen directory: 'D:\python\Lib\site-packages\comtypes\gen'
+2026-04-06 17:01:22,535 - Writing __init__.py file: 'D:\python\Lib\site-packages\comtypes\gen\__init__.py'
+2026-04-06 17:01:22,540 - Using writeable comtypes cache directory: 'D:\python\Lib\site-packages\comtypes\gen'
+2026-04-06 17:01:22,574 - Could not import comtypes.gen._C866CA3A_32F7_11D2_9602_00C04F8EE628_0_5_4: No module named 'comtypes.gen._C866CA3A_32F7_11D2_9602_00C04F8EE628_0_5_4'
+2026-04-06 17:01:22,583 - # Generating comtypes.gen._C866CA3A_32F7_11D2_9602_00C04F8EE628_0_5_4
+2026-04-06 17:01:22,869 - # Generating comtypes.gen.SpeechLib
+2026-04-06 17:01:22,918 - Could not import comtypes.gen._00020430_0000_0000_C000_000000000046_0_2_0: No module named 'comtypes.gen._00020430_0000_0000_C000_000000000046_0_2_0'
+2026-04-06 17:01:22,924 - # Generating comtypes.gen._00020430_0000_0000_C000_000000000046_0_2_0
+2026-04-06 17:01:22,993 - # Generating comtypes.gen.stdole
+2026-04-06 17:01:55,636 - Imported existing <module 'comtypes.gen' from 'D:\\python\\Lib\\site-packages\\comtypes\\gen\\__init__.py'>
+2026-04-06 17:01:55,637 - Using writeable comtypes cache directory: 'D:\python\Lib\site-packages\comtypes\gen'
+2026-04-06 17:02:36,805 - admin logged in
+INFO:comtypes.client._code_cache:Imported existing <module 'comtypes.gen' from 'D:\\python\\Lib\\site-packages\\comtypes\\gen\\__init__.py'>
+INFO:comtypes.client._code_cache:Using writeable comtypes cache directory: 'D:\python\Lib\site-packages\comtypes\gen'
+INFO:root:admin logged in
+2026-04-06 23:37:34 | INFO | Login SUCCESS | user=admin | role=USER
+2026-04-06 23:37:36 | WARNING | MEMORY WARNING: 80.7%
+2026-04-06 23:37:59 | WARNING | MEMORY WARNING: 80.4%
+2026-04-06 23:38:02 | WARNING | MEMORY WARNING: 80.7%
+2026-04-06 23:38:25 | WARNING | MEMORY WARNING: 80.4%
+2026-04-06 23:38:48 | WARNING | MEMORY WARNING: 80.3%
+2026-04-06 23:38:56 | WARNING | MEMORY WARNING: 80.6%
+2026-04-06 23:38:58 | INFO | AI query: why my system hang sometimes
+2026-04-06 23:39:15 | WARNING | MEMORY WARNING: 80.0%
+2026-04-06 23:39:42 | WARNING | MEMORY WARNING: 79.3%
+2026-04-06 23:39:50 | WARNING | MEMORY WARNING: 79.2%
+2026-04-06 23:39:51 | INFO | Login SUCCESS | user=superadmin | role=ADMIN
+2026-04-06 23:39:51 | INFO | Admin panel accessed by superadmin
+2026-04-06 23:39:52 | WARNING | MEMORY WARNING: 79.4%
+2026-04-06 23:39:57 | WARNING | MEMORY WARNING: 79.7%
+2026-04-06 23:40:02 | WARNING | MEMORY WARNING: 79.6%
+2026-04-06 23:40:24 | WARNING | MEMORY WARNING: 79.4%
+2026-04-06 23:40:46 | INFO | User admin logged out.
+2026-04-06 23:42:55 | INFO | Login SUCCESS | user=admin | role=USER
+2026-04-06 23:42:57 | WARNING | MEMORY WARNING: 79.2%
+2026-04-06 23:43:39 | WARNING | MEMORY WARNING: 78.8%
+2026-04-06 23:43:45 | WARNING | MEMORY WARNING: 79.0%
+2026-04-06 23:43:47 | INFO | Login SUCCESS | user=superadmin | role=ADMIN
+2026-04-06 23:43:47 | INFO | Admin panel accessed by superadmin
+2026-04-06 23:43:48 | WARNING | MEMORY WARNING: 79.0%
+2026-04-06 23:43:52 | WARNING | MEMORY WARNING: 79.0%
+2026-04-06 23:44:01 | WARNING | MEMORY WARNING: 79.0%
+2026-04-06 23:57:38 | INFO     | [AUTH] Login SUCCESS | user=admin | role=user
+2026-04-06 23:57:38 | INFO     | [AUTH] Session start | user=admin | role=user | sid=931298EA
+2026-04-06 23:57:40 | WARNING  | [ALERT] MEMORY WARNING 77.0%
+2026-04-06 23:58:44 | WARNING  | [ALERT] MEMORY WARNING 76.9%
+2026-04-06 23:58:47 | INFO     | [AI] AI quick: cpu temperature
+2026-04-06 23:58:57 | WARNING  | [ALERT] MEMORY WARNING 77.0%
+2026-04-06 23:58:57 | INFO     | [AUTH] Sign out | user=admin | sid=931298EA
+2026-04-07 00:02:40 | INFO     | [AUTH] Login SUCCESS | user=viewer1 | role=viewer
+2026-04-07 00:02:40 | INFO     | [AUTH] Session start | user=viewer1 | role=viewer | sid=F7915DD7
+2026-04-07 00:02:42 | WARNING  | [ALERT] MEMORY WARNING 76.0%
+2026-04-07 00:03:26 | WARNING  | [ALERT] MEMORY WARNING 75.6%
+2026-04-07 00:03:29 | INFO     | [AI] AI quick: cpu analysis
+2026-04-07 00:03:52 | WARNING  | [ALERT] MEMORY WARNING 75.4%
+2026-04-07 00:03:52 | INFO     | [AUTH] Sign out | user=viewer1 | sid=F7915DD7
+2026-04-07 00:06:00 | WARNING  | [AUTH] Login FAILED | user=superadmin | role=user
+2026-04-07 00:06:36 | WARNING  | [AUTH] Login FAILED | user=superadmin | role=user
+2026-04-07 00:07:06 | INFO     | [AUTH] Login SUCCESS | user=admin | role=user
+2026-04-07 00:07:06 | INFO     | [AUTH] Session start | user=admin | role=user | sid=A3A98861
+2026-04-07 00:07:07 | WARNING  | [ALERT] MEMORY WARNING 74.5%

@@ -1,0 +1,174 @@
+2026-04-06 17:40:44,314 [INFO] [Auth] User 'admin' logged in
+2026-04-06 17:40:48,061 [INFO] [RCA] Analysis run: severity=NORMAL, cpu=18.6, mem=75.8, disk=31.2
+2026-04-06 17:40:58,232 [INFO] [RCA] Analysis run: severity=NORMAL, cpu=20.8, mem=75.0, disk=31.2
+2026-04-06 17:41:19,084 [INFO] [RCA] Analysis run: severity=NORMAL, cpu=8.7, mem=74.5, disk=31.2
+2026-04-06 17:41:19,101 [INFO] [AI] Query: What is the CPU status?
+2026-04-06 17:41:21,841 [INFO] [RCA] Analysis run: severity=NORMAL, cpu=11.8, mem=74.6, disk=31.2
+2026-04-06 17:41:33,881 [INFO] [RCA] Analysis run: severity=NORMAL, cpu=15.3, mem=74.7, disk=31.2
+2026-04-06 17:41:38,534 [INFO] [RCA] Analysis run: severity=NORMAL, cpu=16.2, mem=74.8, disk=31.2
+2026-04-06 17:41:38,576 [INFO] [AI] Query: why my cpu is high 
+2026-04-06 17:41:41,357 [INFO] [RCA] Analysis run: severity=NORMAL, cpu=17.5, mem=74.9, disk=31.2
+2026-04-06 17:41:49,180 [INFO] [RCA] Analysis run: severity=NORMAL, cpu=12.4, mem=75.1, disk=31.2
+2026-04-06 17:41:49,199 [INFO] [AI] Query: Give me health summary
+2026-04-06 17:41:51,882 [INFO] [RCA] Analysis run: severity=NORMAL, cpu=16.7, mem=75.0, disk=31.2
+2026-04-06 17:41:58,785 [INFO] [RCA] Analysis run: severity=NORMAL, cpu=21.3, mem=75.0, disk=31.2
+2026-04-06 17:42:01,640 [INFO] [RCA] Analysis run: severity=NORMAL, cpu=23.2, mem=75.0, disk=31.2
+2026-04-06 17:42:11,981 [INFO] [RCA] Analysis run: severity=NORMAL, cpu=16.4, mem=74.9, disk=31.2
+2026-04-06 17:43:18,111 [INFO] [RCA] Analysis run: severity=NORMAL, cpu=14.5, mem=73.9, disk=31.2
+2026-04-06 17:43:24,510 [INFO] [RCA] Analysis run: severity=NORMAL, cpu=14, mem=74, disk=31
+2026-04-06 17:43:41,199 [INFO] [RCA] Analysis run: severity=NORMAL, cpu=14.4, mem=73.2, disk=31.2
+2026-04-06 17:43:47,067 [INFO] [RCA] Analysis run: severity=NORMAL, cpu=11.2, mem=73.2, disk=31.2
+2026-04-06 17:43:47,083 [INFO] [AI] Query: hwta about memeory 
+2026-04-06 17:43:49,844 [INFO] [RCA] Analysis run: severity=NORMAL, cpu=11.9, mem=73.2, disk=31.2
+2026-04-06 17:44:08,811 [INFO] [RCA] Analysis run: severity=NORMAL, cpu=13.4, mem=73.3, disk=31.2
+2026-04-06 17:44:15,045 [INFO] [RCA] Analysis run: severity=NORMAL, cpu=13.4, mem=73.2, disk=31.2
+2026-04-06 17:44:29,205 [INFO] [RCA] Analysis run: severity=NORMAL, cpu=20.8, mem=73.0, disk=31.2
+2026-04-06 17:45:18,045 [INFO] [RCA] Analysis run: severity=NORMAL, cpu=13.3, mem=73.6, disk=31.2
+2026-04-06 17:45:25,391 [INFO] [Auth] User 'admin' logged out
+2026-04-06 17:45:36,150 [INFO] [Auth] User 'admin' logged in
+2026-04-06 17:45:39,181 [INFO] [RCA] Analysis run: severity=NORMAL, cpu=15.9, mem=74.5, disk=31.2
+2026-04-06 17:46:01,616 [INFO] [RCA] Analysis run: severity=NORMAL, cpu=15.1, mem=73.0, disk=31.2
+2026-04-06 17:46:08,626 [INFO] [RCA] Analysis run: severity=NORMAL, cpu=44.4, mem=73.4, disk=31.2
+2026-04-06 17:46:23,793 [INFO] [RCA] Analysis run: severity=NORMAL, cpu=17.2, mem=73.2, disk=31.2
+2026-04-06 17:46:23,894 [INFO] [Admin] Voice alerts: disabled
+2026-04-06 17:46:52,180 [INFO] [Auth] User 'admin' logged out
+2026-04-06 17:47:10,601 [WARNING] [Auth] Failed login attempt for 'admin'
+2026-04-06 17:47:23,093 [INFO] [Auth] User 'admin' logged in
+2026-04-06 17:47:26,195 [INFO] [RCA] Analysis run: severity=NORMAL, cpu=35.8, mem=74.1, disk=31.2
+2026-04-06 17:47:55,700 [INFO] [RCA] Analysis run: severity=NORMAL, cpu=19.6, mem=73.4, disk=31.2
+2026-04-06 17:48:18,894 [INFO] [RCA] Analysis run: severity=NORMAL, cpu=12.5, mem=72.9, disk=31.2
+2026-04-06 17:48:42,787 [INFO] [RCA] Analysis run: severity=NORMAL, cpu=14.2, mem=72.5, disk=31.2
+2026-04-06 17:48:48,114 [INFO] [RCA] Analysis run: severity=NORMAL, cpu=16.6, mem=72.6, disk=31.2
+2026-04-06 17:48:52,858 [INFO] [RCA] Analysis run: severity=NORMAL, cpu=9, mem=72, disk=53
+2026-04-06 18:02:44,056 [INFO] [RCA] Analysis run: severity=NORMAL, cpu=13.4, mem=71.1, disk=31.2
+2026-04-06 18:33:21,054 [INFO] [RCA] Analysis run: severity=NORMAL, cpu=10.8, mem=66.6, disk=31.2
+2026-04-06 18:41:57,899 [INFO] [RCA] Analysis run: severity=NORMAL, cpu=18.3, mem=67.2, disk=31.2
+2026-04-06 18:43:09,307 [INFO] [RCA] Analysis run: severity=NORMAL, cpu=18.8, mem=67.4, disk=31.2
+2026-04-06 18:43:15,356 [INFO] [RCA] Analysis run: severity=NORMAL, cpu=45.3, mem=67.8, disk=31.2
+2026-04-06 18:43:41,517 [INFO] [RCA] Analysis run: severity=NORMAL, cpu=17.0, mem=67.9, disk=31.2
+2026-04-06 18:43:46,247 [INFO] [RCA] Analysis run: severity=NORMAL, cpu=19.0, mem=67.9, disk=31.2
+2026-04-06 18:43:50,504 [INFO] [RCA] Analysis run: severity=NORMAL, cpu=26.1, mem=68.0, disk=31.2
+2026-04-06 18:43:53,427 [INFO] [RCA] Analysis run: severity=NORMAL, cpu=17.2, mem=68.0, disk=31.2
+2026-04-06 18:43:58,491 [INFO] [RCA] Analysis run: severity=NORMAL, cpu=16.0, mem=68.0, disk=31.2
+2026-04-06 18:44:08,286 [INFO] [RCA] Analysis run: severity=NORMAL, cpu=12.3, mem=68.0, disk=31.2
+2026-04-06 18:44:20,163 [INFO] [RCA] Analysis run: severity=NORMAL, cpu=13.3, mem=68.0, disk=31.2
+2026-04-06 18:44:23,062 [INFO] [RCA] Analysis run: severity=NORMAL, cpu=18.0, mem=68.1, disk=31.2
+2026-04-06 18:44:45,539 [INFO] [RCA] Analysis run: severity=NORMAL, cpu=17.5, mem=67.8, disk=31.2
+2026-04-06 18:44:57,654 [INFO] [RCA] Analysis run: severity=NORMAL, cpu=16.1, mem=67.7, disk=31.2
+2026-04-06 18:45:02,991 [INFO] [RCA] Analysis run: severity=NORMAL, cpu=19.6, mem=67.7, disk=31.2
+2026-04-06 18:45:03,008 [INFO] [AI] Query: memeory 
+2026-04-06 18:45:06,425 [INFO] [RCA] Analysis run: severity=NORMAL, cpu=24.7, mem=68.1, disk=31.2
+2026-04-06 18:45:31,709 [INFO] [RCA] Analysis run: severity=NORMAL, cpu=15, mem=67, disk=53
+2026-04-06 18:47:42,285 [INFO] [RCA] Analysis run: severity=NORMAL, cpu=15.5, mem=65.9, disk=31.2
+2026-04-06 19:26:03,284 [WARNING] [Auth] Failed user login attempt for 'viewer'
+2026-04-06 19:26:41,495 [INFO] [Auth] User 'viewer' logged in via User Portal
+2026-04-06 19:26:50,000 [INFO] [RCA] Analysis run: severity=NORMAL, cpu=18.9, mem=74.3, disk=31.3
+2026-04-06 19:27:36,488 [INFO] [RCA] Analysis run: severity=NORMAL, cpu=17.8, mem=74.3, disk=31.3
+2026-04-06 19:29:08,327 [INFO] [RCA] Analysis run: severity=NORMAL, cpu=12.0, mem=74.2, disk=31.3
+2026-04-06 19:29:08,356 [INFO] [AI] Query: whi is memeory is high
+2026-04-06 19:29:15,345 [INFO] [RCA] Analysis run: severity=NORMAL, cpu=17.7, mem=74.1, disk=31.3
+2026-04-06 19:29:57,792 [INFO] [RCA] Analysis run: severity=NORMAL, cpu=13.2, mem=73.8, disk=31.3
+2026-04-06 19:29:57,828 [INFO] [AI] Query: System Health
+2026-04-06 19:30:05,067 [INFO] [RCA] Analysis run: severity=NORMAL, cpu=11.0, mem=74.0, disk=31.3
+2026-04-06 19:30:21,581 [INFO] [RCA] Analysis run: severity=NORMAL, cpu=13.8, mem=73.9, disk=31.3
+2026-04-06 19:30:28,617 [INFO] [RCA] Analysis run: severity=NORMAL, cpu=6.7, mem=73.9, disk=31.3
+2026-04-06 19:30:52,558 [INFO] [RCA] Analysis run: severity=NORMAL, cpu=10.5, mem=73.8, disk=31.3
+2026-04-06 19:30:52,652 [INFO] [Report] PDF report generated by viewer
+2026-04-06 19:31:05,010 [INFO] [RCA] Analysis run: severity=NORMAL, cpu=41.9, mem=74.1, disk=31.3
+2026-04-06 19:31:28,944 [INFO] [Auth] User 'viewer' logged out
+2026-04-06 19:31:46,594 [INFO] [Auth] Admin 'admin' logged in via Admin Portal
+2026-04-06 19:31:53,828 [INFO] [RCA] Analysis run: severity=NORMAL, cpu=20.4, mem=73.5, disk=31.3
+2026-04-06 19:32:39,138 [INFO] [RCA] Analysis run: severity=NORMAL, cpu=18.1, mem=73.1, disk=31.3
+2026-04-06 19:32:53,595 [INFO] [RCA] Analysis run: severity=NORMAL, cpu=13.2, mem=73.1, disk=31.3
+2026-04-06 19:33:26,686 [INFO] [RCA] Analysis run: severity=NORMAL, cpu=13.9, mem=72.9, disk=31.3
+2026-04-06 19:33:49,296 [INFO] [RCA] Analysis run: severity=NORMAL, cpu=11.2, mem=72.7, disk=31.3
+2026-04-06 19:34:39,377 [INFO] [Auth] User 'admin' logged out
+2026-04-06 19:35:01,178 [INFO] [Auth] User 'viewer' logged in via User Portal
+2026-04-06 19:35:09,001 [INFO] [RCA] Analysis run: severity=NORMAL, cpu=14.6, mem=72.8, disk=31.3
+2026-04-06 19:36:16,307 [INFO] [RCA] Analysis run: severity=NORMAL, cpu=15.0, mem=72.1, disk=31.3
+2026-04-06 19:36:27,865 [INFO] [RCA] Analysis run: severity=NORMAL, cpu=10.9, mem=70.9, disk=31.3
+2026-04-06 19:36:27,881 [INFO] [AI] Query: solution to cpu health
+2026-04-06 19:36:34,600 [INFO] [RCA] Analysis run: severity=NORMAL, cpu=12.5, mem=71.0, disk=31.3
+2026-04-06 19:44:15,417 [INFO] [Auth] User 'viewer' logged out
+2026-04-06 19:44:26,929 [INFO] [Auth] Admin 'admin' logged in via Admin Portal
+2026-04-06 19:44:35,161 [INFO] [RCA] Analysis run: severity=NORMAL, cpu=18.4, mem=73.5, disk=31.3
+2026-04-06 19:44:47,515 [INFO] [RCA] Analysis run: severity=NORMAL, cpu=15.4, mem=72.9, disk=31.3
+2026-04-06 19:45:01,348 [INFO] [RCA] Analysis run: severity=NORMAL, cpu=18.4, mem=72.8, disk=31.3
+2026-04-06 19:45:37,717 [INFO] [RCA] Analysis run: severity=NORMAL, cpu=16.0, mem=74.1, disk=31.3
+2026-04-06 19:47:13,156 [INFO] [RCA] Analysis run: severity=NORMAL, cpu=12.8, mem=72.7, disk=31.3
+2026-04-06 19:47:13,175 [INFO] [AI] Query: System Health
+2026-04-06 19:47:20,744 [INFO] [RCA] Analysis run: severity=NORMAL, cpu=14.6, mem=72.7, disk=31.3
+2026-04-06 19:47:32,907 [INFO] [RCA] Analysis run: severity=NORMAL, cpu=10.6, mem=72.5, disk=31.3
+2026-04-06 19:47:33,029 [INFO] [Admin] Voice alerts: enabled
+2026-04-06 19:47:44,039 [INFO] [RCA] Analysis run: severity=NORMAL, cpu=19.7, mem=72.7, disk=31.3
+2026-04-06 19:53:48,555 [INFO] [RCA] Analysis run: severity=NORMAL, cpu=25, mem=72, disk=31
+2026-04-06 19:54:03,784 [INFO] [RCA] Analysis run: severity=NORMAL, cpu=17.7, mem=72.1, disk=31.3
+2026-04-06 19:54:40,374 [INFO] [RCA] Analysis run: severity=NORMAL, cpu=16.0, mem=71.6, disk=31.3
+2026-04-06 19:58:23,015 [INFO] [RCA] Analysis run: severity=NORMAL, cpu=18.7, mem=71.0, disk=31.3
+2026-04-06 19:58:23,233 [INFO] [Admin] System config updated: refresh=30s, retention=6d
+2026-04-06 19:58:45,465 [INFO] [RCA] Analysis run: severity=NORMAL, cpu=23.4, mem=70.9, disk=31.3
+2026-04-06 20:20:57,157 [INFO] [RCA] Analysis run: severity=NORMAL, cpu=19.7, mem=77.1, disk=31.3
+2026-04-06 20:21:24,468 [INFO] [RCA] Analysis run: severity=NORMAL, cpu=11.8, mem=77.4, disk=31.3
+2026-04-06 20:22:26,305 [INFO] [RCA] Analysis run: severity=NORMAL, cpu=19.1, mem=77.2, disk=31.3
+2026-04-06 20:23:11,800 [INFO] [RCA] Analysis run: severity=NORMAL, cpu=13.2, mem=77.2, disk=31.3
+2026-04-06 20:23:32,798 [INFO] [RCA] Analysis run: severity=NORMAL, cpu=11.8, mem=77.3, disk=31.3
+2026-04-06 20:23:32,820 [INFO] [AI] Query: give detail about cpu 
+2026-04-06 20:23:40,518 [INFO] [RCA] Analysis run: severity=NORMAL, cpu=23.0, mem=77.4, disk=31.3
+2026-04-06 20:23:57,504 [INFO] [RCA] Analysis run: severity=NORMAL, cpu=14.2, mem=76.2, disk=31.3
+2026-04-06 20:23:57,526 [INFO] [AI] Query: Analyze Memory
+2026-04-06 20:24:05,537 [INFO] [RCA] Analysis run: severity=NORMAL, cpu=15.6, mem=76.3, disk=31.3
+2026-04-06 20:25:33,829 [INFO] [RCA] Analysis run: severity=NORMAL, cpu=12.7, mem=76.1, disk=31.3
+2026-04-06 20:25:35,335 [INFO] [AI] Query: Show top processes
+2026-04-06 20:25:42,515 [INFO] [RCA] Analysis run: severity=NORMAL, cpu=14.1, mem=76.3, disk=31.3
+2026-04-06 20:26:01,948 [INFO] [RCA] Analysis run: severity=NORMAL, cpu=16.7, mem=76.2, disk=31.3
+2026-04-06 20:26:10,294 [INFO] [RCA] Analysis run: severity=NORMAL, cpu=14.5, mem=76.6, disk=31.3
+2026-04-06 20:26:27,969 [INFO] [RCA] Analysis run: severity=NORMAL, cpu=19.5, mem=76.4, disk=31.3
+2026-04-07 00:28:33,355 [WARNING] [Auth] Failed user login attempt for 'viewer'
+2026-04-07 00:28:48,273 [WARNING] [Auth] Admin 'admin' attempted user login portal
+2026-04-07 00:31:50,380 [INFO] [Auth] User 'viewer' logged in via User Portal
+2026-04-07 00:31:59,731 [INFO] [RCA] Analysis run: severity=NORMAL, cpu=18.8, mem=75.2, disk=31.3, temp=54.2°C
+2026-04-07 00:32:19,111 [INFO] [RCA] Analysis run: severity=NORMAL, cpu=11.6, mem=75.2, disk=31.3, temp=54.7°C
+2026-04-07 00:32:19,194 [INFO] [Report] PDF report generated by viewer
+2026-04-07 00:32:31,855 [INFO] [RCA] Analysis run: severity=NORMAL, cpu=42.7, mem=75.2, disk=31.3, temp=57.6°C
+2026-04-07 00:32:47,260 [INFO] [RCA] Analysis run: severity=NORMAL, cpu=13.7, mem=74.9, disk=31.3, temp=49.1°C
+2026-04-07 00:32:47,277 [INFO] [AI] Query: Analyze Memory
+2026-04-07 00:32:54,817 [INFO] [RCA] Analysis run: severity=NORMAL, cpu=13.9, mem=75.0, disk=31.3, temp=50.8°C
+2026-04-07 00:33:26,325 [INFO] [Auth] User 'viewer' logged out
+2026-04-07 00:33:38,740 [INFO] [Auth] Admin 'admin' logged in via Admin Portal
+2026-04-07 00:33:46,705 [INFO] [RCA] Analysis run: severity=NORMAL, cpu=18.6, mem=75.8, disk=31.3, temp=45.1°C
+2026-04-07 00:34:02,982 [INFO] [RCA] Analysis run: severity=NORMAL, cpu=24.4, mem=75.3, disk=31.3, temp=50.2°C
+2026-04-07 00:34:20,556 [INFO] [RCA] Analysis run: severity=NORMAL, cpu=11.7, mem=75.2, disk=31.3, temp=53.2°C
+2026-04-07 00:34:20,858 [INFO] [CPU] TEST ALERT: CPU critical triggered by admin
+2026-04-07 00:34:40,619 [INFO] [RCA] Analysis run: severity=NORMAL, cpu=11.2, mem=75.2, disk=31.3, temp=53.3°C
+2026-04-07 00:34:40,890 [WARNING] [CPU] TEST ALERT: CPU warning triggered by admin
+2026-04-07 00:35:27,024 [INFO] [RCA] Analysis run: severity=NORMAL, cpu=16.4, mem=74.6, disk=31.3, temp=48.2°C
+2026-04-07 00:35:45,119 [INFO] [RCA] Analysis run: severity=NORMAL, cpu=15.1, mem=74.8, disk=31.3, temp=57.8°C
+2026-04-07 00:36:25,125 [INFO] [RCA] Analysis run: severity=NORMAL, cpu=12.7, mem=74.3, disk=31.3, temp=46.3°C
+2026-04-07 00:36:25,366 [WARNING] [CPU] TEST ALERT: TEST: CPU at 82%
+2026-04-07 00:36:25,367 [WARNING] [Memory] TEST ALERT: TEST: Memory at 88%
+2026-04-07 00:36:25,367 [INFO] [CPUTemp] TEST ALERT: TEST: CPU Temp at 92°C
+2026-04-07 00:36:42,962 [INFO] [RCA] Analysis run: severity=NORMAL, cpu=11.4, mem=74.4, disk=31.3, temp=53.9°C
+2026-04-07 00:36:43,253 [WARNING] [Disk] TEST ALERT: Disk warning triggered by admin
+2026-04-07 00:36:58,055 [INFO] [RCA] Analysis run: severity=NORMAL, cpu=15.0, mem=74.5, disk=31.3, temp=51.1°C
+2026-04-07 00:36:58,348 [WARNING] [Memory] TEST ALERT: Memory warning triggered by admin
+2026-04-07 00:37:40,320 [INFO] [Auth] User 'admin' logged out
+2026-04-07 00:37:59,129 [INFO] [Auth] User 'viewer' logged in via User Portal
+2026-04-07 00:38:07,215 [INFO] [RCA] Analysis run: severity=NORMAL, cpu=13.4, mem=74.7, disk=31.3, temp=54.3°C
+2026-04-07 00:38:45,231 [INFO] [RCA] Analysis run: severity=NORMAL, cpu=17.4, mem=74.1, disk=31.3, temp=56.4°C
+2026-04-07 00:38:45,256 [INFO] [AI] Query: describe my system heatlsystem 
+2026-04-07 00:38:52,355 [INFO] [RCA] Analysis run: severity=NORMAL, cpu=23.5, mem=74.2, disk=31.3, temp=57.2°C
+2026-04-07 00:39:43,385 [INFO] [RCA] Analysis run: severity=NORMAL, cpu=11.0, mem=73.9, disk=31.3, temp=52.3°C
+2026-04-07 00:39:50,686 [INFO] [RCA] Analysis run: severity=NORMAL, cpu=21.6, mem=74.1, disk=31.3, temp=47.5°C
+2026-04-07 00:40:11,601 [INFO] [RCA] Analysis run: severity=NORMAL, cpu=11.7, mem=73.9, disk=31.3, temp=52.2°C
+2026-04-07 00:40:42,880 [INFO] [RCA] Analysis run: severity=NORMAL, cpu=15.8, mem=74.0, disk=31.3, temp=52.6°C
+2026-04-07 00:40:42,904 [INFO] [AI] Query: health of cpu and memory 
+2026-04-07 00:40:50,331 [INFO] [RCA] Analysis run: severity=NORMAL, cpu=16.3, mem=73.9, disk=31.3, temp=47.7°C
+2026-04-07 00:57:05,305 [INFO] [Auth] User 'viewer' logged in (role: viewer)
+2026-04-07 00:58:50,702 [INFO] [Auth] User 'viewer' logged out
+2026-04-07 00:59:18,649 [INFO] [Auth] Admin 'admin' logged in
+2026-04-07 01:01:39,379 [INFO] [CPU] TEST ALERT: CPU critical
+2026-04-07 01:01:55,329 [WARNING] [CPU] TEST ALERT: CPU warning
+2026-04-07 01:02:33,802 [INFO] [CPUTemp] TEST ALERT: Temp critical
+2026-04-07 01:05:18,025 [INFO] [Auth] User 'admin' logged out
+2026-04-07 01:05:31,744 [WARNING] [Auth] Failed login attempt for 'viewer'
+2026-04-07 01:05:44,023 [INFO] [Auth] User 'viewer' logged in (role: viewer)
