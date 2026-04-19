@@ -539,7 +539,7 @@ health_color = get_health_color(health_score)
 temp_color   = get_temp_color(cpu_temp, temp_threshold)
 
 # ─────────────────────────────
-# AUTO ALERT CHECK (no voice)
+# AUTO ALERT CHECK
 # ─────────────────────────────
 thresholds = admin_config.get("alert_thresholds", {"cpu": 80, "memory": 85, "disk": 90, "cpu_temp": 80})
 if "last_alert_time" not in st.session_state:

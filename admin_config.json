@@ -16,8 +16,11 @@
   "alert_thresholds": {
     "cpu": 80,
     "memory": 85,
-    "disk": 90
+    "disk": 90,
+    "cpu_temp": 80
   },
+  "auto_refresh_interval": 30,
+  "retention_days": 6,
   "email_config": {
     "enabled": false,
     "smtp_server": "",
@@ -26,7 +29,5 @@
     "password": "",
     "recipients": []
   },
-  "auto_refresh_interval": 30,
-  "retention_days": 6,
   "voice_alerts": true
 }

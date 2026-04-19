@@ -178,3 +178,20 @@
 2026-04-07 12:32:49,106 [INFO] [Auth] User 'admin' logged out
 2026-04-07 12:33:14,170 [INFO] [Auth] User 'viewer' logged in (role: viewer)
 2026-04-07 12:33:19,018 [INFO] [Auth] User 'viewer' logged out
+2026-04-07 12:48:56,128 [WARNING] [Auth] Failed login attempt for 'viewer'
+2026-04-07 12:49:05,349 [WARNING] [Auth] Failed login attempt for 'viewer1'
+2026-04-07 12:49:29,559 [INFO] [Auth] User 'viewer' logged in (role: viewer)
+2026-04-07 12:50:08,358 [INFO] [Auth] User 'viewer' logged out
+2026-04-07 12:50:29,104 [INFO] [Auth] Admin 'admin' logged in
+2026-04-07 12:51:34,439 [WARNING] [CPU] TEST ALERT: CPU warning
+2026-04-07 13:24:42,896 [INFO] [Auth] User 'viewer' logged in (role: viewer)
+2026-04-07 13:26:46,540 [INFO] [Auth] User 'viewer' logged out
+2026-04-07 13:26:57,064 [INFO] [Auth] Admin 'admin' logged in
+2026-04-07 13:27:35,230 [INFO] [Admin] Thresholds updated: CPU=80%, MEM=85%, DISK=90%, TEMP=80°C
+2026-04-07 13:28:27,353 [INFO] [CPU] TEST ALERT: CPU critical
+2026-04-19 17:58:37,096 [INFO] [Auth] User 'viewer' logged in (role: viewer)
+2026-04-19 17:58:58,052 [INFO] [Auth] User 'viewer' logged out
+2026-04-19 17:59:14,666 [INFO] [Auth] Admin 'admin' logged in
+2026-04-19 17:59:40,381 [INFO] [CPU] TEST ALERT: CPU critical
+2026-04-19 18:00:05,188 [WARNING] [CPU] TEST ALERT: CPU warning
+2026-04-19 18:00:24,784 [INFO] [Auth] User 'admin' logged out
